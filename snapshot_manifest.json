@@ -1,5 +1,5 @@
 {
-  "checkpoint": "2026-11-15-after-step-28-slot-server-prepared",
+  "checkpoint": "2026-11-15-step-31-online-income",
   "provenance": "Reconstructed from latest conversation code, not exported from user Studio",
   "original_rbxl_received": false,
   "generated_place": "places/NUMBER_RUSH_reconstructed.rbxlx",
@@ -14,13 +14,13 @@
       "source": "src/ServerScriptService/GameServer.server.lua",
       "studio_path": "ServerScriptService/GameServer",
       "class": "Script",
-      "sha256": "9322ec1a02f285facfdf1515ac174e9471fe72cef1f3ae2a2ef0325c7c1e38cc"
+      "sha256": "43f890fcb5160f73c944ef9ba99610a890749f63c9a0cca6a740bbf129fbc273"
     },
     {
       "source": "src/ServerScriptService/IncomeSlotService.lua",
       "studio_path": "ServerScriptService/IncomeSlotService",
       "class": "ModuleScript",
-      "sha256": "525719c2a1a2595d29aca152009696b520dece448e44cf8467bfc1b1f207b696"
+      "sha256": "de01e20ee5f7b32d9ee1c2bdc4e969b1755fb14664605aee3a7b243319cb63fc"
     },
     {
       "source": "src/ServerScriptService/NumberEconomy.lua",
@@ -47,10 +47,16 @@
       "sha256": "1b4de1cc73f1c431af490dcac0f7eae18cc6f56e8dba9a9efd63e5e45699014f"
     },
     {
+      "source": "src/ServerScriptService/OnlineIncomeService.lua",
+      "studio_path": "ServerScriptService/OnlineIncomeService",
+      "class": "ModuleScript",
+      "sha256": "7f1968d03874586a2a5e9dbc6e3c625ed48d8e0feb0d3c76dc3bb5e34141db9e"
+    },
+    {
       "source": "src/ServerScriptService/PlayerDataStore.lua",
       "studio_path": "ServerScriptService/PlayerDataStore",
       "class": "ModuleScript",
-      "sha256": "1dda52cc712edd7815525e636e1a72b865a3a57eb84ddf1fb6154f2ea1c60528"
+      "sha256": "85e761d3802dc79b8ddd10b0f7394cbceb1ee639504940d7afcd69ceeafe4c0d"
     },
     {
       "source": "src/ServerScriptService/SpinService.lua",
@@ -63,6 +69,12 @@
       "studio_path": "StarterPlayer/StarterPlayerScripts/CollectionUI",
       "class": "LocalScript",
       "sha256": "90ade5351dd0f8ccb7970a59a713759f76d4309dfb188bf6d294b6917fe3900c"
+    },
+    {
+      "source": "src/StarterPlayer/StarterPlayerScripts/IncomeSlotUI.client.lua",
+      "studio_path": "StarterPlayer/StarterPlayerScripts/IncomeSlotUI",
+      "class": "LocalScript",
+      "sha256": "20c56365f8c4a6dddef318a2047217fb8afe6f79789dade5ddd233d127ef1cc8"
     },
     {
       "source": "src/StarterPlayer/StarterPlayerScripts/NumberRushUI.client.lua",

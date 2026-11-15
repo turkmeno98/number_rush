@@ -4,6 +4,7 @@ local Config = require(ReplicatedStorage:WaitForChild("GameConfig"))
 local PlayerDataStore = require(script.Parent:WaitForChild("PlayerDataStore"))
 local SpinService = require(script.Parent:WaitForChild("SpinService"))
 local IncomeSlotService = require(script.Parent:WaitForChild("IncomeSlotService"))
+local OnlineIncomeService = require(script.Parent:WaitForChild("OnlineIncomeService"))
 local remotes = ReplicatedStorage:WaitForChild("NumberRushRemotes")
 local spinRequest = remotes:WaitForChild("SpinRequest")
 local spinResult = remotes:WaitForChild("SpinResult")
@@ -53,12 +54,13 @@ local function publishSlots(player, state)
 	player:SetAttribute("SlotRevision", state.Revision)
 	player:SetAttribute("ActiveIncomeSlotCount", state.ActiveCount)
 	player:SetAttribute("TotalBaseIncomePerHour", state.TotalBaseIncomePerHour)
-	player:SetAttribute("IncomeEnabled", false)
+	player:SetAttribute("IncomeEnabled", state.IncomeEnabled == true)
 end
 
 local function closeProfile(player)
 	local session = sessions[player]
 	if not session or session.Closing then return end
+	OnlineIncomeService.Stop(session)
 	session.Closing = true
 	player:SetAttribute("DataReady", false)
 	if session.BalanceConnection then session.BalanceConnection:Disconnect() end
@@ -142,6 +144,13 @@ local function setupPlayer(player)
 		end
 		session.Data.Balance = value
 	end)
+	local incomeReady, incomeError = OnlineIncomeService.Initialize(session)
+	if not incomeReady then
+		warn("NUMBER RUSH: проверка дохода: " .. tostring(incomeError))
+		stopSession(player, "Не удалось проверить доход. Подключитесь немного позже.")
+		return
+	end
+	slots.State.IncomeEnabled = true
 	publishInventory(player, session)
 	publishSlots(player, slots.State)
 	leaderstats.Parent = player
@@ -290,6 +299,22 @@ end)
 Players.PlayerRemoving:Connect(closeProfile)
 Players.PlayerAdded:Connect(setupPlayer)
 for _, player in Players:GetPlayers() do task.spawn(setupPlayer, player) end
+
+task.spawn(function()
+	while not shuttingDown do
+		task.wait(1)
+		for player, session in pairs(sessions) do
+			if session.Closing or session.Closed or session.NeedsRecovery or session.Busy
+				or session.SpinBusy or session.RequestBusy or session.SlotBusy then continue end
+			local ok, reason = OnlineIncomeService.Accrue(session)
+			if not ok then
+				session.NeedsRecovery = true
+				warn("NUMBER RUSH: начисление дохода: " .. tostring(reason))
+				stopSession(player, "Доход требует проверки. Подключитесь немного позже.")
+			end
+		end
+	end
+end)
 
 task.spawn(function()
 	while not shuttingDown do

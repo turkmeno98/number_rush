@@ -21,7 +21,7 @@ def walk(parent,prefix=''):
         instances[path]=item
         walk(item,path)
 walk(tree.getroot())
-assert len(manifest['sources'])==11
+assert len(manifest['sources'])==13
 for entry in manifest['sources']:
     file=ROOT/entry['source']
     assert hashlib.sha256(file.read_bytes()).hexdigest()==entry['sha256'],file
@@ -62,6 +62,7 @@ assert 'DataStoreService' not in collection
 assert 'NumberInventory' in collection
 assert 'AttributeChanged:Connect(queueRender)' in collection
 assert 'CollectionUI' in project['tree']['StarterPlayer']['StarterPlayerScripts']
+assert instances['StarterPlayer/StarterPlayerScripts/IncomeSlotUI'].get('class')=='LocalScript'
 assert instances['ServerScriptService/IncomeSlotService'].get('class')=='ModuleScript'
 assert 'IncomeSlotService.Initialize(session)' in server
 assert 'slotRequest.OnServerEvent:Connect' in server
@@ -71,5 +72,5 @@ assert 'Balance =' not in slots and 'Balance +=' not in slots
 assert (ROOT/'docs/HANDOFF.md').is_file()
 assert (ROOT/'docs/BALANCE_V02.md').is_file()
 assert (ROOT/'AGENTS.md').is_file()
-print('PASS: 11 source hashes and XML Source roundtrips; instance classes; collection and slot server included; 4 RemoteEvents; disabled probes excluded; 12 unique codes; 3 weight totals; checkpoint documents.')
+print('PASS: 13 source hashes and XML Source roundtrips; instance classes; slot UI/server and online income included; 4 RemoteEvents; disabled probes excluded; 12 unique codes; 3 weight totals; checkpoint documents.')
 print('Not executed: Luau runtime, Studio import, DataStore operations, multiplayer fault cases.')

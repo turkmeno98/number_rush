@@ -1,4 +1,4 @@
--- Assignment only. This module does not credit online or offline income yet.
+-- Assignment service; online income is settled by a server-session hook.
 local PlayerDataStore = require(script.Parent:WaitForChild("PlayerDataStore"))
 local IncomeSlotService = {}
 IncomeSlotService.CooldownSeconds = 3600
@@ -59,10 +59,10 @@ local function validateBook(data)
 	return true
 end
 
-local function snapshot(data)
+local function snapshot(data, incomeEnabled)
 	local now = os.time()
 	local state = {Revision = data.SlotRevision, SlotCount = data.IncomeSlotCount,
-		ActiveCount = 0, TotalBaseIncomePerHour = 0, IncomeEnabled = false, ServerTime = now, Slots = {}}
+		ActiveCount = 0, TotalBaseIncomePerHour = 0, IncomeEnabled = incomeEnabled == true, ServerTime = now, Slots = {}}
 	for index = 1, data.IncomeSlotCount do
 		local slot = data.IncomeSlots[tostring(index)]
 		local changedAt = slot and slot.ChangedAt
@@ -111,15 +111,19 @@ end
 
 local function saveMutation(session)
 	if not available(session) then return nil, "RecoveryRequired", "SessionClosing" end
+	if session.UpdateIncomeRate then
+		local ok, reason = session.UpdateIncomeRate()
+		if not ok then return nil, "RecoveryRequired", reason end
+	end
 	local saved, reason = PlayerDataStore.Save(session, false)
 	-- On an unknown write outcome retain the consistent new state; never roll back blindly.
 	if not saved then return nil, "RecoveryRequired", tostring(reason) end
 	if not available(session) then return nil, "RecoveryRequired", "SessionClosing" end
-	return {Status = "Success", State = snapshot(session.Data)}
+	return {Status = "Success", State = snapshot(session.Data, session.IncomeClock ~= nil)}
 end
 
 function IncomeSlotService.Initialize(session)
-	return run(session, function() return {Status = "Ready", State = snapshot(session.Data)} end)
+	return run(session, function() return {Status = "Ready", State = snapshot(session.Data, session.IncomeClock ~= nil)} end)
 end
 
 IncomeSlotService.GetState = IncomeSlotService.Initialize
@@ -135,7 +139,7 @@ function IncomeSlotService.Install(session, index, issuanceId, revision)
 		local key = tostring(index)
 		local slot = data.IncomeSlots[key]
 		if slot and slot.IssuanceId == issuanceId then
-			return {Status = "Unchanged", State = snapshot(data)}
+			return {Status = "Unchanged", State = snapshot(data, session.IncomeClock ~= nil)}
 		end
 		if item.Location == "IncomeSlot" then return nil, "AlreadyAssigned" end
 		if item.Location ~= "Inventory" then return nil, "ItemUnavailable" end
@@ -162,7 +166,7 @@ function IncomeSlotService.Remove(session, index, revision)
 		local valid, code = checkRequest(data, index, revision)
 		if not valid then return nil, code end
 		local slot = data.IncomeSlots[tostring(index)]
-		if not slot or not slot.IssuanceId then return {Status = "Unchanged", State = snapshot(data)} end
+		if not slot or not slot.IssuanceId then return {Status = "Unchanged", State = snapshot(data, session.IncomeClock ~= nil)} end
 		local activeCount = 0
 		for _, record in pairs(data.IncomeSlots) do
 			if record.IssuanceId then activeCount = activeCount + 1 end
