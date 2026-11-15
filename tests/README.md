@@ -1,5 +1,7 @@
 # Проверки серверного назначения слотов
 
+Шаг 33: tests/equip_best.lua содержит 15 изолированных проверок, выполненных в Studio Luau с точным исходником сервиса и подменённым PlayerDataStore. Все прошли. Cooldown отменён пользователем; tests/income_slots.lua скорректирован под новое правило, но его локальный Lua 5.4 runner на этой Windows в этом шаге не запускался.
+
 ```bash
 python3 tools/test_income_slots.py
 ```

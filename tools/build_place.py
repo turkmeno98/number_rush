@@ -107,7 +107,7 @@ def build():
     ET.ElementTree(root).write(output, encoding='utf-8', xml_declaration=True)
 
     manifest = {
-        'checkpoint': '2026-11-15-step-32-xp-desktop-interface',
+        'checkpoint': '2026-11-15-step-33-full-desktop-best-slots',
         'provenance': 'Reconstructed from latest conversation code, not exported from user Studio',
         'original_rbxl_received': False,
         'generated_place': output.relative_to(ROOT).as_posix(),

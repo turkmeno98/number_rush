@@ -233,16 +233,12 @@ local slotMessages = {
 	AlreadyAssigned = "Этот номер уже установлен в другом слоте.",
 	ItemUnavailable = "Номер занят другим действием.",
 	LastIncomeSource = "Сначала установите другой номер: последний занятый слот нельзя оставить пустым.",
-	Cooldown = "Этот слот пока нельзя заменить.",
 	RevisionLimit = "Не удалось обновить слоты. Обратитесь к разработчику.",
 	RecoveryRequired = "Переподключитесь для проверки сохранённого назначения.",
 }
 
 local function sendSlotError(player, session, code, details)
 	local message = slotMessages[code] or "Не удалось изменить доходный слот."
-	if code == "Cooldown" and type(details) == "number" then
-		message = "Замена этого слота доступна через " .. tostring(math.ceil(details / 60)) .. " мин."
-	end
 	local state = nil
 	if session and code == "StaleSlots" then
 		local response = IncomeSlotService.GetState(session)
@@ -268,7 +264,7 @@ slotRequest.OnServerEvent:Connect(function(player, action, index, issuanceId, re
 		return
 	end
 	session.LastSlotRequestAt = now
-	if action ~= "GetState" and action ~= "Install" and action ~= "Remove" then
+	if action ~= "GetState" and action ~= "Install" and action ~= "Remove" and action ~= "EquipBest" then
 		sendSlotError(player, session, "InvalidAction"); return
 	end
 	local result, code, details
@@ -276,6 +272,8 @@ slotRequest.OnServerEvent:Connect(function(player, action, index, issuanceId, re
 		result, code, details = IncomeSlotService.GetState(session)
 	elseif action == "Install" then
 		result, code, details = IncomeSlotService.Install(session, index, issuanceId, revision)
+	elseif action == "EquipBest" then
+		result, code, details = IncomeSlotService.EquipBest(session, revision)
 	else
 		result, code, details = IncomeSlotService.Remove(session, index, revision)
 	end
