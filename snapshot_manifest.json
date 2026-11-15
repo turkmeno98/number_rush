@@ -1,5 +1,5 @@
 {
-  "checkpoint": "2026-11-15-after-step-27-slot-remotes-prepared",
+  "checkpoint": "2026-11-15-after-step-28-slot-server-prepared",
   "provenance": "Reconstructed from latest conversation code, not exported from user Studio",
   "original_rbxl_received": false,
   "generated_place": "places/NUMBER_RUSH_reconstructed.rbxlx",
@@ -14,7 +14,13 @@
       "source": "src/ServerScriptService/GameServer.server.lua",
       "studio_path": "ServerScriptService/GameServer",
       "class": "Script",
-      "sha256": "ff1b597d5dfc4cd4434f0876ed3b96af3f4a3330810343937cc1335106848c49"
+      "sha256": "9322ec1a02f285facfdf1515ac174e9471fe72cef1f3ae2a2ef0325c7c1e38cc"
+    },
+    {
+      "source": "src/ServerScriptService/IncomeSlotService.lua",
+      "studio_path": "ServerScriptService/IncomeSlotService",
+      "class": "ModuleScript",
+      "sha256": "525719c2a1a2595d29aca152009696b520dece448e44cf8467bfc1b1f207b696"
     },
     {
       "source": "src/ServerScriptService/NumberEconomy.lua",

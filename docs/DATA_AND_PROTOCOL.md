@@ -16,7 +16,7 @@
 
 Постоянные Data:
 
-- Balance, Inventory (словарь IssuanceId → предмет), IncomeSlots (пока пустая таблица).
+- Balance, Inventory (словарь IssuanceId → предмет), IncomeSlots (книга назначений).
 - InventoryCapacity = 25, IncomeSlotCount = 3 по умолчанию.
 - NextSpinSequence: появляется при инициализации сервера, начинается с 1.
 - PendingSpin: журнал одной незавершённой платной выдачи.
@@ -61,8 +61,8 @@ Session.Token/LeaseUntil/Busy/Closing/SpinBusy/RequestBusy/NeedsRecovery/Balance
 | SpinResult Success | Сервер → клиент | Status, Sequence, Balance, Item, NextSequence, InventoryCount |
 | SpinResult Cancelled | Сервер → клиент | Status, Sequence, Balance, Reason, NextSequence, InventoryCount |
 | SpinResult Error | Сервер → клиент | Status, ErrorCode, Sequence?, Message, NextSequence?, Ready |
-| SlotRequest | Клиент → сервер | Подготовлен для шага 28, обработчик и контракт ещё не реализованы |
-| SlotResult | Сервер → клиент | Подготовлен для шага 28, обработчик и контракт ещё не реализованы |
+| SlotRequest | Клиент → сервер | action: GetState/Install/Remove, slotIndex?, issuanceId?, expectedRevision? |
+| SlotResult | Сервер → клиент | Status: Ready/Success/Unchanged/Error, State?, ErrorCode?, Message?, Ready? |
 
 Предварительные ошибки могут не иметь Sequence. Клиент игнорирует Busy во время ожидания текущей операции. Таймаут UI 60 секунд показывает задержку, но не отправляет новый платёж и не включает кнопку для повторного списания.
 
@@ -74,3 +74,19 @@ Session.Token/LeaseUntil/Busy/Closing/SpinBusy/RequestBusy/NeedsRecovery/Balance
 - Предмет: FullNumber, DisplayNumber, Digits, Code, ProfileId, OperatorId, OperatorName, Region, RarityIndex/Name, BasePrice, SalePrice, IncomePerHour, DigitMultiplier, PrestigeMultiplier, CodeMatchMultiplier, HasCodeMatch, IssuanceId, Generation, OperationId, OriginalOwnerId, CanBoostSale, Location, AcquiredAt.
 
 Папки/атрибуты клиента не являются источником прав владения. Следующие операции должны читать профиль и реестр, не доверять изменениям GUI.
+
+## Назначение доходных слотов — сервер подготовлен, UI и начисление впереди
+
+IncomeSlotService поддерживает Initialize/GetState, Install и Remove. GameServer обрабатывает SlotRequest, но текущая CollectionUI пока не отправляет такие запросы.
+
+Data.IncomeSlots хранит строковые ключи "1"…"5": {IssuanceId?, ChangedAt?}. После снятия ChangedAt сохраняется. Data.SlotRevision добавляется как 0 только если отсутствует; после успешного изменения увеличивается. Item.Location = "IncomeSlot" и Item.IncomeSlotIndex согласуются с книгой в одном сохранении профиля. Серверный профиль — источник принадлежности; эта операция владельца глобального реестра не меняет.
+
+Install требует unlocked slotIndex, IssuanceId из своего Inventory, Location Inventory и актуальную revision. Один выпуск не может стоять в двух слотах. Повтор уже установленного назначения с текущей revision — Unchanged без записи и сброса таймера; старый revision — StaleSlots, не новая операция. Замена разрешена через 3600 секунд от установки. Remove бесплатен, не сбрасывает таймер, но последний занятый слот снять нельзя.
+
+GetState без дополнительных аргументов; Install(slotIndex, issuanceId, expectedRevision); Remove(slotIndex, nil, expectedRevision) на RemoteEvent. Ответ State содержит Revision, SlotCount, ActiveCount, TotalBaseIncomePerHour, IncomeEnabled=false, ServerTime и массив Slots. Ряды: SlotIndex, IssuanceId?, DisplayNumber?, RarityName?, IncomePerHour?, LastChangedAt, NextChangeAt, CooldownRemaining.
+
+В Players/<игрок>/IncomeSlots публикуются три Folder по номерам слотов с атрибутами ряда. У Player есть SlotRevision, ActiveIncomeSlotCount, TotalBaseIncomePerHour, IncomeEnabled=false. Это отображение, не доверенный ввод и не реальное начисление.
+
+SlotBusy защищает назначение от спина и автосохранения. Сервис отклоняет работу при SpinBusy/RequestBusy/Busy/PendingSpin; GameServer не запускает новый спин/автосохранение при SlotBusy. Ошибка записи блокирует сессию до переподключения, слепого отката после неизвестного результата нет. Старые данные не сбрасываются при нарушении связей книги и Inventory.
+
+При последующем добавлении дохода учитывать те же блокировки и сначала рассчитывать заработанное старым назначением, затем менять слот. Пока сервис вообще не меняет Balance и не создаёт часы начисления.

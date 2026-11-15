@@ -3,9 +3,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Config = require(ReplicatedStorage:WaitForChild("GameConfig"))
 local PlayerDataStore = require(script.Parent:WaitForChild("PlayerDataStore"))
 local SpinService = require(script.Parent:WaitForChild("SpinService"))
+local IncomeSlotService = require(script.Parent:WaitForChild("IncomeSlotService"))
 local remotes = ReplicatedStorage:WaitForChild("NumberRushRemotes")
 local spinRequest = remotes:WaitForChild("SpinRequest")
 local spinResult = remotes:WaitForChild("SpinResult")
+local slotRequest = remotes:WaitForChild("SlotRequest")
+local slotResult = remotes:WaitForChild("SlotResult")
 local sessions, loading = {}, {}
 local shuttingDown = false
 
@@ -30,6 +33,27 @@ local function publishInventory(player, session)
 	end
 	player:SetAttribute("InventoryCount", count)
 	player:SetAttribute("NextSpinSequence", session.Data.NextSpinSequence or 1)
+end
+
+local function publishSlots(player, state)
+	local folder = player:FindFirstChild("IncomeSlots")
+	if not folder then folder = Instance.new("Folder"); folder.Name = "IncomeSlots"; folder.Parent = player end
+	folder:ClearAllChildren()
+	folder:SetAttribute("Revision", state.Revision)
+	folder:SetAttribute("ServerTime", state.ServerTime)
+	for _, row in ipairs(state.Slots) do
+		local entry = Instance.new("Folder")
+		entry.Name = tostring(row.SlotIndex)
+		for key, value in pairs(row) do
+			local kind = type(value)
+			if kind == "string" or kind == "number" or kind == "boolean" then entry:SetAttribute(key, value) end
+		end
+		entry.Parent = folder
+	end
+	player:SetAttribute("SlotRevision", state.Revision)
+	player:SetAttribute("ActiveIncomeSlotCount", state.ActiveCount)
+	player:SetAttribute("TotalBaseIncomePerHour", state.TotalBaseIncomePerHour)
+	player:SetAttribute("IncomeEnabled", false)
 end
 
 local function closeProfile(player)
@@ -93,6 +117,12 @@ local function setupPlayer(player)
 		return
 	end
 	if player.Parent ~= Players or shuttingDown then closeProfile(player); return end
+	local slots, slotError, slotDetails = IncomeSlotService.Initialize(session)
+	if not slots then
+		warn("NUMBER RUSH: проверка слотов: " .. tostring(slotDetails or slotError))
+		stopSession(player, "Не удалось проверить доходные слоты. Подключитесь немного позже.")
+		return
+	end
 	local leaderstats = Instance.new("Folder")
 	leaderstats.Name = "leaderstats"
 	local rubles = Instance.new("IntValue")
@@ -113,9 +143,11 @@ local function setupPlayer(player)
 		session.Data.Balance = value
 	end)
 	publishInventory(player, session)
+	publishSlots(player, slots.State)
 	leaderstats.Parent = player
 	player:SetAttribute("DataReady", true)
 	print("NUMBER RUSH: профиль загружен. Баланс: " .. tostring(session.Data.Balance))
+	print("NUMBER RUSH: доходных слотов доступно: " .. tostring(slots.State.SlotCount))
 end
 
 local messages = {
@@ -143,7 +175,7 @@ spinRequest.OnServerEvent:Connect(function(player, code, sequence)
 	local now = os.clock()
 	if session.LastRequestAt and now - session.LastRequestAt < 0.25 then return end
 	session.LastRequestAt = now
-	if session.RequestBusy or session.SpinBusy then sendError(player, session, nil, "Busy"); return end
+	if session.RequestBusy or session.SpinBusy or session.SlotBusy then sendError(player, session, nil, "Busy"); return end
 	if type(code) ~= "string" or not Config.CodeOffers[code] then sendError(player, session, nil, "InvalidCode"); return end
 	if type(sequence) ~= "number" or sequence % 1 ~= 0 or sequence < 1 or sequence > 1000000000 then sendError(player, session, nil, "InvalidSequence"); return end
 	local lastSpin = session.Data.LastSpin
@@ -180,6 +212,81 @@ spinRequest.OnServerEvent:Connect(function(player, code, sequence)
 	send(player, receipt)
 end)
 
+local slotMessages = {
+	Busy = "Дождитесь завершения текущего действия.",
+	SessionUnavailable = "Профиль временно недоступен.",
+	InvalidAction = "Неизвестное действие со слотом.",
+	InvalidSlot = "Выберите доступный доходный слот.",
+	InvalidRevision = "Обновите состояние слотов.",
+	StaleSlots = "Состояние слотов изменилось. Проверьте выбор и повторите действие.",
+	InvalidItem = "Выберите номер из своей коллекции.",
+	ItemNotOwned = "Этого номера нет в вашей коллекции.",
+	AlreadyAssigned = "Этот номер уже установлен в другом слоте.",
+	ItemUnavailable = "Номер занят другим действием.",
+	LastIncomeSource = "Сначала установите другой номер: последний занятый слот нельзя оставить пустым.",
+	Cooldown = "Этот слот пока нельзя заменить.",
+	RevisionLimit = "Не удалось обновить слоты. Обратитесь к разработчику.",
+	RecoveryRequired = "Переподключитесь для проверки сохранённого назначения.",
+}
+
+local function sendSlotError(player, session, code, details)
+	local message = slotMessages[code] or "Не удалось изменить доходный слот."
+	if code == "Cooldown" and type(details) == "number" then
+		message = "Замена этого слота доступна через " .. tostring(math.ceil(details / 60)) .. " мин."
+	end
+	local state = nil
+	if session and code == "StaleSlots" then
+		local response = IncomeSlotService.GetState(session)
+		if response then state = response.State end
+	end
+	if player.Parent == Players then
+		slotResult:FireClient(player, {Status = "Error", ErrorCode = code, Message = message,
+			State = state, Ready = player:GetAttribute("DataReady") == true})
+	end
+end
+
+slotRequest.OnServerEvent:Connect(function(player, action, index, issuanceId, revision)
+	local session = sessions[player]
+	if not session or player:GetAttribute("DataReady") ~= true then
+		sendSlotError(player, session, "SessionUnavailable"); return
+	end
+	local now = os.clock()
+	if session.LastSlotRequestAt and now - session.LastSlotRequestAt < 0.2 then
+		if not session.LastSlotThrottleReplyAt or now - session.LastSlotThrottleReplyAt >= 1 then
+			session.LastSlotThrottleReplyAt = now
+			sendSlotError(player, session, "Busy")
+		end
+		return
+	end
+	session.LastSlotRequestAt = now
+	if action ~= "GetState" and action ~= "Install" and action ~= "Remove" then
+		sendSlotError(player, session, "InvalidAction"); return
+	end
+	local result, code, details
+	if action == "GetState" then
+		result, code, details = IncomeSlotService.GetState(session)
+	elseif action == "Install" then
+		result, code, details = IncomeSlotService.Install(session, index, issuanceId, revision)
+	else
+		result, code, details = IncomeSlotService.Remove(session, index, revision)
+	end
+	if not result then
+		if code == "RecoveryRequired" then
+			player:SetAttribute("DataReady", false)
+			warn("NUMBER RUSH: сохранение слота: " .. tostring(details))
+			sendSlotError(player, session, code)
+			stopSession(player, "Назначение слота требует проверки. Подключитесь немного позже.")
+		else
+			sendSlotError(player, session, code, details)
+		end
+		return
+	end
+	if session.Closing or session.Closed or player.Parent ~= Players then return end
+	if result.Status == "Success" then publishInventory(player, session) end
+	publishSlots(player, result.State)
+	slotResult:FireClient(player, result)
+end)
+
 Players.PlayerRemoving:Connect(closeProfile)
 Players.PlayerAdded:Connect(setupPlayer)
 for _, player in Players:GetPlayers() do task.spawn(setupPlayer, player) end
@@ -193,11 +300,11 @@ task.spawn(function()
 				stopSession(player, "Связь с хранилищем потеряна. Подключитесь немного позже.")
 				continue
 			end
-			if session.SpinBusy or session.RequestBusy then continue end
+			if session.SpinBusy or session.RequestBusy or session.SlotBusy then continue end
 			if os.clock() >= session.NextSaveAt and not session.Busy then
 				session.NextSaveAt = os.clock() + 30
 				task.spawn(function()
-					if session.Closing or session.Closed or session.SpinBusy or session.RequestBusy then return end
+					if session.Closing or session.Closed or session.SpinBusy or session.RequestBusy or session.SlotBusy then return end
 					local saved, saveError = PlayerDataStore.Save(session, false)
 					if not saved then warn("NUMBER RUSH: ошибка автосохранения: " .. tostring(saveError)) end
 				end)
