@@ -6,6 +6,7 @@ local Config = require(ReplicatedStorage:WaitForChild("GameConfig"))
 local playerGui = player:WaitForChild("PlayerGui")
 local gui = playerGui:WaitForChild("NumberRushUI", 30)
 if not gui then warn("NUMBER RUSH: окно терминала не найдено"); return end
+if gui:GetAttribute("InterfaceVersion") == 2 then return end -- DesktopUI owns the new collection.
 local window = gui:WaitForChild("Window", 15)
 if not window then warn("NUMBER RUSH: Window не найден"); return end
 if window:FindFirstChild("CollectionButton") then return end

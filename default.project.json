@@ -38,6 +38,9 @@
         "CollectionUI": {
           "$path": "src/StarterPlayer/StarterPlayerScripts/CollectionUI.client.lua"
         },
+        "DesktopUI": {
+          "$path": "src/StarterPlayer/StarterPlayerScripts/DesktopUI.lua"
+        },
         "IncomeSlotUI": {
           "$path": "src/StarterPlayer/StarterPlayerScripts/IncomeSlotUI.client.lua"
         },

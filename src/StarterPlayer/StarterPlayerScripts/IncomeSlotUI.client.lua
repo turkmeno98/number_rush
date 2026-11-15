@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
 local gui = player:WaitForChild("PlayerGui"):WaitForChild("NumberRushUI", 30)
 if not gui then return end
+if gui:GetAttribute("InterfaceVersion") == 2 then return end -- DesktopUI owns the new slot view.
 local collection = gui:WaitForChild("CollectionPanel", 30)
 if not collection then return end
 local entries = collection:WaitForChild("Entries", 15)

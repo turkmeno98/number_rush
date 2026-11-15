@@ -1,5 +1,5 @@
 {
-  "checkpoint": "2026-11-15-step-31-online-income",
+  "checkpoint": "2026-11-15-step-32-xp-desktop-interface",
   "provenance": "Reconstructed from latest conversation code, not exported from user Studio",
   "original_rbxl_received": false,
   "generated_place": "places/NUMBER_RUSH_reconstructed.rbxlx",
@@ -68,19 +68,25 @@
       "source": "src/StarterPlayer/StarterPlayerScripts/CollectionUI.client.lua",
       "studio_path": "StarterPlayer/StarterPlayerScripts/CollectionUI",
       "class": "LocalScript",
-      "sha256": "90ade5351dd0f8ccb7970a59a713759f76d4309dfb188bf6d294b6917fe3900c"
+      "sha256": "d124e99fc9e379a18457e4bbb42d782b9b4d7658573390d287fd2e019b9763c4"
+    },
+    {
+      "source": "src/StarterPlayer/StarterPlayerScripts/DesktopUI.lua",
+      "studio_path": "StarterPlayer/StarterPlayerScripts/DesktopUI",
+      "class": "ModuleScript",
+      "sha256": "a9af66e8eb67d1916be4d96d1b53fce13dc43d0544867d6c0380e7786db47994"
     },
     {
       "source": "src/StarterPlayer/StarterPlayerScripts/IncomeSlotUI.client.lua",
       "studio_path": "StarterPlayer/StarterPlayerScripts/IncomeSlotUI",
       "class": "LocalScript",
-      "sha256": "20c56365f8c4a6dddef318a2047217fb8afe6f79789dade5ddd233d127ef1cc8"
+      "sha256": "77d1e436612bec25488851ea0092073aca900b8ebfde9f22e02ae8006731db3a"
     },
     {
       "source": "src/StarterPlayer/StarterPlayerScripts/NumberRushUI.client.lua",
       "studio_path": "StarterPlayer/StarterPlayerScripts/NumberRushUI",
       "class": "LocalScript",
-      "sha256": "868133cdbe2ebdd4206069c2e78047ab2bca2d2a94f38bc25fb2d305a1817b30"
+      "sha256": "e4f4be0070fb51f8ef6c6de027399265637d4b5060ceaed55f96cf6181e51c01"
     }
   ],
   "remote_events": [
