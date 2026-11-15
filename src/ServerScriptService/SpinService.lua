@@ -7,6 +7,7 @@ local NumberEconomy = require(script.Parent:WaitForChild("NumberEconomy"))
 local NumberRegistry = require(script.Parent:WaitForChild("NumberRegistry"))
 local SpinService = {}
 local MAX_CANDIDATES = 8
+local random = Random.new()
 
 local function copyTable(source)
 	local result = {}
@@ -35,8 +36,8 @@ local function persist(session)
 	return PlayerDataStore.Save(session, false)
 end
 
-local function makeDraft(code, rarityIndex)
-	local offer = Config.CodeOffers[code]
+local function makeDraft(code, rarityIndex, context)
+	local offer = context or Config.CodeOffers[code]
 	if not offer then return nil, "Предложение недоступно" end
 	local digits, generationError = NumberGenerator.GenerateDigits(rarityIndex)
 	if not digits then return nil, generationError end
@@ -47,6 +48,11 @@ local function makeDraft(code, rarityIndex)
 	draft.OperatorId = offer.OperatorId
 	draft.OperatorName = offer.OperatorName
 	draft.Region = offer.Region
+	if context then
+		draft.RegionId = context.RegionId
+		draft.OfferPrice = context.OfferPrice
+		draft.EconomyVersion = 3
+	end
 	return draft
 end
 
@@ -87,7 +93,11 @@ local function finishPending(session)
 			if pending.Attempt >= MAX_CANDIDATES then
 				return refundPending(session, "Не найден свободный номер выбранной категории")
 			end
-			local nextDraft, draftError = makeDraft(draft.Code, draft.RarityIndex)
+			local context = draft.EconomyVersion == 3 and {
+				ProfileId = "Regional", OperatorId = draft.OperatorId, OperatorName = draft.OperatorName,
+				Region = draft.Region, RegionId = draft.RegionId, OfferPrice = pending.Price,
+			} or nil
+			local nextDraft, draftError = makeDraft(draft.Code, draft.RarityIndex, context)
 			if not nextDraft then return refundPending(session, draftError) end
 			if not sessionAvailable(session) then return nil, "RecoveryRequired", "Сессия закрывается" end
 			pending.Attempt += 1
@@ -137,10 +147,12 @@ function SpinService.Recover(session)
 	return runExclusive(session, function() return finishPending(session) end)
 end
 
-function SpinService.Start(session, code, sequence)
+function SpinService.Start(session, operatorId, regionId, sequence)
 	return runExclusive(session, function()
 		local data = session.Data
-		if type(code) ~= "string" or not Config.CodeOffers[code] then return nil, "InvalidCode" end
+		if type(operatorId) ~= "string" or type(regionId) ~= "string" then return nil, "InvalidRegion" end
+		local offer = Config.ResolveRegion(operatorId, regionId)
+		if not offer then return nil, "InvalidRegion" end
 		if type(sequence) ~= "number" or sequence % 1 ~= 0 or sequence < 1 or sequence > 1000000000 then return nil, "InvalidSequence" end
 		if data.LastSpin and data.LastSpin.Sequence == sequence then return copyTable(data.LastSpin) end
 		if data.PendingSpin then
@@ -149,25 +161,25 @@ function SpinService.Start(session, code, sequence)
 		end
 		local nextSequence = data.NextSpinSequence or 1
 		if sequence ~= nextSequence then return nil, "StaleRequest" end
-		local offer = Config.CodeOffers[code]
-		local profile = Config.Profiles[offer.ProfileId]
-		if data.Balance < profile.Price then return nil, "NotEnoughMoney" end
+		if data.Balance < offer.Price then return nil, "NotEnoughMoney" end
 		local count = 0
 		for _ in pairs(data.Inventory) do count += 1 end
 		if count >= data.InventoryCapacity then return nil, "InventoryFull" end
 		local startedAt = DateTime.now().UnixTimestampMillis
-		local rarityIndex = NumberGenerator.RollRarity(offer.ProfileId)
-		local draft, draftError = makeDraft(code, rarityIndex)
+		local rarityIndex = NumberGenerator.RollRarity("Regional")
+		local code = offer.Codes[random:NextInteger(1, #offer.Codes)]
+		local draft, draftError = makeDraft(code, rarityIndex, {ProfileId = "Regional", OperatorId = offer.OperatorId,
+			OperatorName = offer.OperatorName, Region = offer.Region, RegionId = offer.Id, OfferPrice = offer.Price})
 		if not draft then return nil, "GenerationFailed", draftError end
 		if not sessionAvailable(session) then return nil, "SessionUnavailable" end
 		local pending = {
 			OperationId = HttpService:GenerateGUID(false), Sequence = sequence,
-			Price = profile.Price, Attempt = 1, Draft = draft,
+			Price = offer.Price, Attempt = 1, Draft = draft,
 			NotBeforeMillis = startedAt + Config.SpinDuration * 1000,
 		}
 		data.PendingSpin = pending
 		data.NextSpinSequence = sequence + 1
-		data.Balance -= profile.Price
+		data.Balance -= offer.Price
 		syncBalance(session)
 		local saved, saveError = persist(session)
 		if not saved then return nil, "RecoveryRequired", saveError end

@@ -25,6 +25,12 @@
         "SlotResult": {
           "$className": "RemoteEvent"
         }
+      },
+      "NewsConfig": {
+        "$path": "src/ReplicatedStorage/NewsConfig.lua"
+      },
+      "RegionCatalog": {
+        "$path": "src/ReplicatedStorage/RegionCatalog.lua"
       }
     },
     "ServerScriptService": {

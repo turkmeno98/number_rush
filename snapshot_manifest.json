@@ -1,5 +1,5 @@
 {
-  "checkpoint": "2026-11-15-step-33-full-desktop-best-slots",
+  "checkpoint": "2026-11-15-step-34-regional-draws",
   "provenance": "Reconstructed from latest conversation code, not exported from user Studio",
   "original_rbxl_received": false,
   "generated_place": "places/NUMBER_RUSH_reconstructed.rbxlx",
@@ -8,13 +8,25 @@
       "source": "src/ReplicatedStorage/GameConfig.lua",
       "studio_path": "ReplicatedStorage/GameConfig",
       "class": "ModuleScript",
-      "sha256": "1b2195a43db243adbe7f4d5d5b6c7ae606bc0eb5e8930e5e19970e1df8c44e2e"
+      "sha256": "d3987b25d2b479ee622cd4689889dac40324a69a80e2c2974b512960d7070ee2"
+    },
+    {
+      "source": "src/ReplicatedStorage/NewsConfig.lua",
+      "studio_path": "ReplicatedStorage/NewsConfig",
+      "class": "ModuleScript",
+      "sha256": "b6055a84c82ddf20267a43c8a3a72cdcd338d862eacc7426c77a8a14c10e7962"
+    },
+    {
+      "source": "src/ReplicatedStorage/RegionCatalog.lua",
+      "studio_path": "ReplicatedStorage/RegionCatalog",
+      "class": "ModuleScript",
+      "sha256": "13b14b54e7462fe8638185874c5b7b88bc586413e2e08d94b6ba9d71a8c359cc"
     },
     {
       "source": "src/ServerScriptService/GameServer.server.lua",
       "studio_path": "ServerScriptService/GameServer",
       "class": "Script",
-      "sha256": "a055fec52cd291526305b0223755d138571f562214775abeb345fbf8578c0337"
+      "sha256": "e242a6a46cedfa394d7ec481a42582bd978904db0d9639dffdf5c9319450fc18"
     },
     {
       "source": "src/ServerScriptService/IncomeSlotService.lua",
@@ -62,7 +74,7 @@
       "source": "src/ServerScriptService/SpinService.lua",
       "studio_path": "ServerScriptService/SpinService",
       "class": "ModuleScript",
-      "sha256": "a9f39b511eb4a25452944329a965bfb7c58455baa12e6a50ee662ebee3879673"
+      "sha256": "cb7f4d0187c67437c46f6d9e456d291888d8afe2f4fd3994825dc3dd75bfc7e3"
     },
     {
       "source": "src/StarterPlayer/StarterPlayerScripts/CollectionUI.client.lua",
@@ -74,7 +86,7 @@
       "source": "src/StarterPlayer/StarterPlayerScripts/DesktopUI.lua",
       "studio_path": "StarterPlayer/StarterPlayerScripts/DesktopUI",
       "class": "ModuleScript",
-      "sha256": "289c0c63eafe2931e2554f5bdc37e323f8cc7585e3609243a655bdf889edbd2b"
+      "sha256": "481456a83e66af35f508a48121ef9c4a68bb7ffe4a9afa2ac290f50ccd5f4099"
     },
     {
       "source": "src/StarterPlayer/StarterPlayerScripts/IncomeSlotUI.client.lua",

@@ -1,5 +1,9 @@
 # Сохранения и сетевой протокол
 
+## Дополнение шага 34 — выдача по региону
+
+SpinRequest = operatorId:string, regionId:string, sequence:integer. Старый пакет code/sequence отклоняется без оплаты. Started содержит OperatorId/RegionId/Duration; код определяется только сервером. Предмет v3 хранит EconomyVersion=3, RegionId и OfferPrice; для оценки применяется Regional с престижем 1. Цена и регион фиксируются в PendingSpin. Повтор кандидата использует сохранённый контекст, возврат — PendingSpin.Price. Legacy PendingSpin без EconomyVersion продолжает восстанавливаться через прежний CodeOffers; старые предметы не переписываются. SchemaVersion и имена/ключи DataStore прежние. Ниже старые описания выбора кода относятся к исторической версии.
+
 ## Дополнение шага 33 — свободная замена и EquipBest
 
 SlotRequest допускает действие EquipBest: клиент отправляет action, nil, nil, expectedRevision. Сервер сам выбирает предметы по IncomePerHour, SalePrice и стабильному IssuanceId; клиент не передаёт лучший набор. В одном снимке сохраняются все назначения, ревизия, баланс и остаток дохода. Повтор оптимального набора возвращает Unchanged. Неизвестный результат записи переводит сессию в NeedsRecovery без слепого отката. ChangedAt остаётся исторической меткой для совместимости; NextChangeAt и CooldownRemaining всегда нули. Формат/имена DataStore и SchemaVersion не менялись. Старые описания часового ограничения ниже отменены.
@@ -63,7 +67,7 @@ Session.Token/LeaseUntil/Busy/Closing/SpinBusy/RequestBusy/NeedsRecovery/Balance
 
 | Событие | Направление | Параметры |
 |---|---|---|
-| SpinRequest | Клиент → сервер | code: string, sequence: integer |
+| SpinRequest | Клиент → сервер | operatorId: string, regionId: string, sequence: integer |
 | SpinResult Started | Сервер → клиент | Status, Sequence, Code, Duration |
 | SpinResult Success | Сервер → клиент | Status, Sequence, Balance, Item, NextSequence, InventoryCount |
 | SpinResult Cancelled | Сервер → клиент | Status, Sequence, Balance, Reason, NextSequence, InventoryCount |

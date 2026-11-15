@@ -21,7 +21,7 @@ def walk(parent,prefix=''):
         instances[path]=item
         walk(item,path)
 walk(tree.getroot())
-assert len(manifest['sources'])==14
+assert len(manifest['sources'])==16
 for entry in manifest['sources']:
     file=ROOT/entry['source']
     assert hashlib.sha256(file.read_bytes()).hexdigest()==entry['sha256'],file
@@ -41,7 +41,7 @@ assert config.rstrip().endswith('return Config')
 codes=re.findall(r'Code = "(\d{3})"',config)
 assert len(codes)==len(set(codes))==12
 weights=re.findall(r'Weights = \{([^}]+)\}',config)
-assert len(weights)==3
+assert len(weights)==4
 for row in weights:
     values=list(map(int,re.findall(r'\d+',row)))
     assert len(values)==6 and sum(values)==10000000
@@ -54,7 +54,13 @@ assert 'WaitForChild("DesktopUI")' in bootstrap
 ui=(ROOT/'src/StarterPlayer/StarterPlayerScripts/DesktopUI.lua').read_text()
 assert instances['StarterPlayer/StarterPlayerScripts/DesktopUI'].get('class')=='ModuleScript'
 assert 'WaitForChild("leaderstats", 30)' in ui
-assert 'requestRemote:FireServer(code, sequence)' in ui
+assert 'requestRemote:FireServer(operatorId, regionId, sequence)' in ui
+assert 'itemDetails' not in ui
+assert 'sidebar.Visible = true' in ui
+assert instances['ReplicatedStorage/RegionCatalog'].get('class')=='ModuleScript'
+assert instances['ReplicatedStorage/NewsConfig'].get('class')=='ModuleScript'
+assert 'RegionCatalog' in project['tree']['ReplicatedStorage']
+assert 'NewsConfig' in project['tree']['ReplicatedStorage']
 assert 'WindowScale' not in ui
 assert 'SetCoreGuiEnabled' not in ui
 collection_path='StarterPlayer/StarterPlayerScripts/CollectionUI'
@@ -75,5 +81,5 @@ assert 'Balance =' not in slots and 'Balance +=' not in slots
 assert (ROOT/'docs/HANDOFF.md').is_file()
 assert (ROOT/'docs/BALANCE_V02.md').is_file()
 assert (ROOT/'AGENTS.md').is_file()
-print('PASS: 14 source hashes and XML Source roundtrips; desktop UI and online income included; 4 RemoteEvents; disabled probes excluded; 12 unique codes; 3 weight totals; checkpoint documents.')
+print('PASS: 16 source hashes and XML Source roundtrips; regional catalog, news and desktop UI included; 4 RemoteEvents; disabled probes excluded; 12 legacy codes; 4 weight totals; checkpoint documents.')
 print('Not executed: Luau runtime, Studio import, DataStore operations, multiplayer fault cases.')

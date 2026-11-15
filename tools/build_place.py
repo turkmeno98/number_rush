@@ -107,7 +107,7 @@ def build():
     ET.ElementTree(root).write(output, encoding='utf-8', xml_declaration=True)
 
     manifest = {
-        'checkpoint': '2026-11-15-step-33-full-desktop-best-slots',
+        'checkpoint': '2026-11-15-step-34-regional-draws',
         'provenance': 'Reconstructed from latest conversation code, not exported from user Studio',
         'original_rbxl_received': False,
         'generated_place': output.relative_to(ROOT).as_posix(),
@@ -131,6 +131,9 @@ def build():
         'ServerScriptService':{'$className':'ServerScriptService','$path':'src/ServerScriptService'},
         'StarterPlayer':{'$className':'StarterPlayer','StarterPlayerScripts':client_tree},
     }}
+    for entry in entries:
+        if entry['studio_path'].startswith('ReplicatedStorage/') and entry['studio_path'].count('/') == 1:
+            project['tree']['ReplicatedStorage'][entry['studio_path'].rsplit('/',1)[1]] = {'$path':entry['source']}
     (ROOT/'default.project.json').write_text(json.dumps(project,ensure_ascii=False,indent=2)+'\n')
     print(f'Built {output.relative_to(ROOT)} with {len(entries)} source scripts.')
 

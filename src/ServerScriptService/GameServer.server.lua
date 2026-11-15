@@ -160,6 +160,7 @@ local function setupPlayer(player)
 end
 
 local messages = {
+	InvalidRegion = "Выберите доступного оператора и регион.",
 	InvalidCode = "Выберите доступный код.",
 	InvalidSequence = "Обновите выбор и повторите попытку.",
 	StaleRequest = "Состояние терминала обновилось. Повторите попытку.",
@@ -178,29 +179,29 @@ local function sendError(player, session, sequence, code)
 	})
 end
 
-spinRequest.OnServerEvent:Connect(function(player, code, sequence)
+spinRequest.OnServerEvent:Connect(function(player, operatorId, regionId, sequence)
 	local session = sessions[player]
 	if not session or player:GetAttribute("DataReady") ~= true then sendError(player, session, nil, "SessionUnavailable"); return end
 	local now = os.clock()
 	if session.LastRequestAt and now - session.LastRequestAt < 0.25 then return end
 	session.LastRequestAt = now
 	if session.RequestBusy or session.SpinBusy or session.SlotBusy then sendError(player, session, nil, "Busy"); return end
-	if type(code) ~= "string" or not Config.CodeOffers[code] then sendError(player, session, nil, "InvalidCode"); return end
+	if type(operatorId) ~= "string" or type(regionId) ~= "string" then sendError(player, session, nil, "InvalidRegion"); return end
+	local offer = Config.ResolveRegion(operatorId, regionId)
+	if not offer then sendError(player, session, nil, "InvalidRegion"); return end
 	if type(sequence) ~= "number" or sequence % 1 ~= 0 or sequence < 1 or sequence > 1000000000 then sendError(player, session, nil, "InvalidSequence"); return end
 	local lastSpin = session.Data.LastSpin
 	local repeated = lastSpin and lastSpin.Sequence == sequence
 	if not repeated then
 		if sequence ~= (session.Data.NextSpinSequence or 1) then sendError(player, session, sequence, "StaleRequest"); return end
-		local offer = Config.CodeOffers[code]
-		local profile = Config.Profiles[offer.ProfileId]
-		if session.Data.Balance < profile.Price then sendError(player, session, sequence, "NotEnoughMoney"); return end
+		if session.Data.Balance < offer.Price then sendError(player, session, sequence, "NotEnoughMoney"); return end
 		local count = 0
 		for _ in pairs(session.Data.Inventory) do count += 1 end
 		if count >= session.Data.InventoryCapacity then sendError(player, session, sequence, "InventoryFull"); return end
 	end
 	session.RequestBusy = true
-	if not repeated then send(player, {Status = "Started", Sequence = sequence, Code = code, Duration = Config.SpinDuration}) end
-	local receipt, errorCode, details = SpinService.Start(session, code, sequence)
+	if not repeated then send(player, {Status = "Started", Sequence = sequence, OperatorId = operatorId, RegionId = regionId, Duration = Config.SpinDuration}) end
+	local receipt, errorCode, details = SpinService.Start(session, operatorId, regionId, sequence)
 	session.RequestBusy = false
 	if not receipt then
 		warn("NUMBER RUSH: прокрутка: " .. tostring(errorCode) .. " " .. tostring(details or ""))

@@ -1,0 +1,17 @@
+{
+  "snapshot_date": "2026-10-26",
+  "retrieved_on": "2026-11-15",
+  "source_commit": "7687c22cfc3b5243c15ee107a00b1af5b0d4ebe5",
+  "source_url": "https://github.com/MrProLopstar/phoneoperator/blob/7687c22cfc3b5243c15ee107a00b1af5b0d4ebe5/src/data/mobile.ts",
+  "upstream": "https://opendata.digital.gov.ru/downloads/DEF-9xx.csv",
+  "source_sha256": "a264167137930d874bb9564e9fe7874727070b5357c5b660f686b208b32a2c05",
+  "ranges_read": 4995,
+  "offer_counts": {
+    "beelink": 97,
+    "mobitel": 97,
+    "megalink": 97,
+    "telenova": 97
+  },
+  "region_count": 97,
+  "caveat": "Registry-derived snapshot, not a live MNP lookup. Cities share their subject's code pool. Seven digits are fictional game combinations."
+}

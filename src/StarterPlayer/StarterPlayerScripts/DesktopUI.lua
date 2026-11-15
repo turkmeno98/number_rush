@@ -9,6 +9,7 @@ function DesktopUI.Start()
 	local SoundService = game:GetService("SoundService")
 	local player = Players.LocalPlayer
 	local Config = require(ReplicatedStorage:WaitForChild("GameConfig"))
+	local News = require(ReplicatedStorage:WaitForChild("NewsConfig"))
 	local playerGui = player:WaitForChild("PlayerGui")
 	local previous = playerGui:FindFirstChild("NumberRushUI")
 	if previous then previous:Destroy() end
@@ -109,7 +110,7 @@ function DesktopUI.Start()
 			return r
 		end
 		local white = Color3.fromRGB(248, 253, 255)
-		local blue = Color3.fromRGB(45, 116, 215)
+		local blue = key == "collection" and color or Color3.fromRGB(45, 116, 215)
 		local gold = Color3.fromRGB(241, 185, 53)
 		local shadow = shape(7, 37, 35, 6, Color3.fromRGB(18, 49, 79), 4); shadow.BackgroundTransparency = 0.6
 		if key == "terminal" then
@@ -186,7 +187,7 @@ function DesktopUI.Start()
 	local slotRequestSerial, selectedItemId, collectionMode = 0, nil, "numbers"
 	local spinBusy, activeSequence, nextSequence, animationToken = false, nil, 0, 0
 	local spinStarted, rosterPreference = false, nil
-	local selectedOperator, selectedOffer, lastItem = 1, Config.Operators[1].Codes[1], nil
+	local selectedOperator, selectedOffer, lastItem = 1, Config.GetDefaultOffer(Config.Operators[1].Id), nil
 	local remotes = ReplicatedStorage:WaitForChild("NumberRushRemotes", 15)
 	local requestRemote = remotes and remotes:WaitForChild("SpinRequest", 15)
 	local resultRemote = remotes and remotes:WaitForChild("SpinResult", 15)
@@ -206,7 +207,7 @@ function DesktopUI.Start()
 	local menuLabel = label(sidebar, "Title", "АБОНЕНТСКИЙ ОТДЕЛ", UDim2.fromOffset(8, 4), UDim2.new(1, -16, 0, 24), 9, C.blue, true)
 	menuLabel.TextXAlignment = Enum.TextXAlignment.Center
 	local menus = {
-		{"terminal", "ТЕРМИНАЛ", C.blue}, {"collection", "НОМЕРА", C.blue}, {"profile", "ПРОФИЛЬ", C.blue}, {"boosts", "БУСТЫ", C.purple},
+		{"terminal", "ТЕРМИНАЛ", C.blue}, {"collection", "НОМЕРА", C.blue}, {"profile", "ПРОФИЛЬ", C.blue},
 		{"mail", "ПОЧТА", C.blue}, {"settings", "НАСТРОЙКИ", C.muted}, {"upgrades", "ПРОКАЧКА", C.purple},
 		{"trade", "ТОРГИ", Color3.fromRGB(194, 106, 35)}, {"quests", "ЗАДАНИЯ", C.green},
 		{"top", "РЕЙТИНГ", C.gold}, {"shop", "МАГАЗИН", Color3.fromRGB(180, 65, 116)},
@@ -245,7 +246,7 @@ function DesktopUI.Start()
 	local windowTitle = label(header, "Title", "NUMBER RUSH — ТЕРМИНАЛ", UDim2.fromOffset(49, 0), UDim2.new(1, -125, 1, 0), 16, Color3.new(1, 1, 1), true, 12)
 	button(header, "Minimize", "—", UDim2.new(1, -93, 0, 7), UDim2.fromOffset(24, 24), function() setExpanded(false) end, C.blueLight, 12).TextColor3 = Color3.new(1, 1, 1)
 	button(header, "Maximize", "[]", UDim2.new(1, -62, 0, 7), UDim2.fromOffset(24, 24), function() maximized = not maximized; layoutDesktop() end, C.blueLight, 12).TextColor3 = Color3.new(1, 1, 1)
-	button(header, "Close", "X", UDim2.new(1, -31, 0, 7), UDim2.fromOffset(24, 24), function() window.Visible = false end, C.red, 12).TextColor3 = Color3.new(1, 1, 1)
+	button(header, "Close", "X", UDim2.new(1, -31, 0, 7), UDim2.fromOffset(24, 24), function() setExpanded(false) end, C.red, 12).TextColor3 = Color3.new(1, 1, 1)
 	local body = frame(window, "Body", UDim2.fromOffset(14, 50), UDim2.new(1, -28, 1, -84), C.cream, 11)
 	local status = label(window, "Status", "Подключение к станции...", UDim2.new(0, 15, 1, -28), UDim2.new(1, -30, 0, 24), 11, C.muted, false, 12)
 	local pages = {}
@@ -278,8 +279,8 @@ function DesktopUI.Start()
 	helpButton.Activated:Connect(function()
 		window.Visible = true
 		information("СПРАВОЧНАЯ УЗЛА СВЯЗИ", {
-			"Пуск — получение номеров. Выберите оператора и код: цена и шансы зависят от профиля, а не от бренда оператора.",
-			"Коллекция — поиск, редкость, сортировка и подробности SIM-карт. Установите номер в доходный слот, чтобы получать рубли онлайн.",
+			"Выберите оператора и регион. Код подберёт станция. Шансы одинаковы везде; доплата за крупный город не гарантирует редкость.",
+			"Список номеров — красивые SIM-карточки, поиск, редкость и сортировка. Кнопка на карточке открывает установку в доходные слоты.",
 			"Слоты меняются без ожидания. «Закрепить лучшее» выбирает максимальный доход, затем стоимость. Последний занятый слот снять нельзя.",
 			"Разделы с отметкой «Скоро» показывают будущие возможности. Покупки, автопродажа и торги в них ещё недоступны.",
 		})
@@ -288,9 +289,12 @@ function DesktopUI.Start()
 	local generator = pages.terminal
 	label(generator, "Section", "ВЫДАЧА АБОНЕНТСКИХ НОМЕРОВ", UDim2.fromOffset(0, 0), UDim2.new(1, -90, 0, 22), 11, C.muted, true)
 	button(generator, "Probabilities", "Шансы", UDim2.new(1, -82, 0, -2), UDim2.fromOffset(82, 26), function()
-		local profile = Config.Profiles[selectedOffer.ProfileId]
-		local lines = {profile.Name .. " профиль · " .. money(profile.Price) .. " ₽ за попытку"}
-		for i, weight in ipairs(profile.Weights) do table.insert(lines, Config.Rarities[i].Name .. ": " .. string.format("%.5f", weight / 100000) .. "%") end
+		local profile = Config.Profiles.Regional
+		local lines = {selectedOffer.Region .. " · " .. money(selectedOffer.Price) .. " ₽ за попытку. Во всех регионах действуют одинаковые шансы."}
+		for i, weight in ipairs(profile.Weights) do
+			local percent = string.format("%.5f", weight / 100000):gsub("0+$", ""):gsub("%.$", ""):gsub("%.", ",")
+			table.insert(lines, Config.Rarities[i].Name .. ": " .. percent .. "%")
+		end
 		information("ВЕРОЯТНОСТИ ВЫДАЧИ", lines)
 	end)
 	local operatorButtons = {}
@@ -298,7 +302,7 @@ function DesktopUI.Start()
 	for i, op in ipairs(Config.Operators) do
 		operatorButtons[i] = button(generator, op.Id, op.Name, UDim2.new((i - 1) / 4, 0, 0, 32), UDim2.new(0.25, -6, 0, 32), function() if not spinBusy then selectOperator(i) end end, C.paper)
 	end
-	local codeButton = button(generator, "CodeSelector", "Выбрать регион и код", UDim2.fromOffset(0, 74), UDim2.new(1, -94, 0, 36), nil, C.paper)
+	local codeButton = button(generator, "CodeSelector", "Выбрать регион", UDim2.fromOffset(0, 74), UDim2.new(1, -94, 0, 36), nil, C.paper)
 	local autoSettings = button(generator, "AutoSettings", "Авто...", UDim2.new(1, -86, 0, 74), UDim2.fromOffset(86, 36), function()
 		clear(modalContent); modalTitle.Text = "АВТОПРОДАЖА — СКОРО"; modal.Visible = true
 		modalAction.Visible = false; modalActionCallback = nil; modalContent.Size = UDim2.new(1, -36, 1, -62); modalContent.CanvasPosition = Vector2.zero
@@ -318,6 +322,8 @@ function DesktopUI.Start()
 	end)
 	local ticket = frame(generator, "NumberCard", UDim2.fromOffset(0, 122), UDim2.new(1, 0, 1, -218), C.paper)
 	corner(ticket, 5); stroke(ticket)
+	local ticketStroke = ticket:FindFirstChildOfClass("UIStroke")
+	local operatorRibbon = frame(ticket, "OperatorColor", UDim2.fromOffset(0, 0), UDim2.new(1, 0, 0, 5), C.blue, 3)
 	local punch = frame(ticket, "SIMChip", UDim2.fromOffset(18, 18), UDim2.fromOffset(34, 27), Color3.fromRGB(221, 188, 103), 3)
 	corner(punch, 4); stroke(punch, C.gold)
 	for i = 1, 2 do frame(punch, "Contact", UDim2.new(i / 3, 0, 0, 0), UDim2.new(0, 1, 1, 0), C.gold, 4) end
@@ -325,7 +331,7 @@ function DesktopUI.Start()
 	local ticketBrand = label(ticket, "Operator", "БиЛайнк / АБОНЕНТСКАЯ КАРТОЧКА", UDim2.fromOffset(65, 18), UDim2.new(1, -78, 0, 28), 11, C.muted, true)
 	local number = label(ticket, "Number", "+7 (903) •••-••-••", UDim2.new(0, 14, 0.34, 0), UDim2.new(1, -28, 0, 52), 32, C.ink, true)
 	number.Font = Enum.Font.Code; number.TextXAlignment = Enum.TextXAlignment.Center
-	local resultDetails = label(ticket, "Details", "Гарантия: обычный и выше", UDim2.new(0, 16, 1, -58), UDim2.new(1, -32, 0, 38), 13, C.muted)
+	local resultDetails = label(ticket, "Details", "Все шесть редкостей · единые шансы", UDim2.new(0, 16, 1, -58), UDim2.new(1, -32, 0, 38), 13, C.muted)
 	resultDetails.TextXAlignment = Enum.TextXAlignment.Center
 	local spinButton = button(generator, "SpinButton", "ПОЛУЧИТЬ НОМЕР", UDim2.new(0, 132, 1, -66), UDim2.new(1, -132, 0, 43), nil, C.green)
 	spinButton.TextColor3 = Color3.new(1, 1, 1); spinButton.TextSize = 17
@@ -340,21 +346,20 @@ function DesktopUI.Start()
 	local generatorNote = label(generator, "Timing", "Одна SIM-карта · 6 секунд · оплата только на сервере", UDim2.new(0, 0, 1, -18), UDim2.new(1, 0, 0, 18), 10, C.muted)
 	local regionPopup = frame(generator, "RegionPopup", UDim2.fromOffset(0, 114), UDim2.new(1, 0, 1, -190), C.paper, 15)
 	stroke(regionPopup, C.blue, 2); corner(regionPopup, 4); regionPopup.Visible = false
-	local regionSearch = textbox(regionPopup, "Search", "Название региона или код...", UDim2.fromOffset(12, 12), UDim2.new(1, -55, 0, 32))
+	local regionSearch = textbox(regionPopup, "Search", "Регион или город...", UDim2.fromOffset(12, 12), UDim2.new(1, -55, 0, 32))
 	regionSearch.ZIndex = 16
 	button(regionPopup, "Close", "X", UDim2.new(1, -34, 0, 16), UDim2.fromOffset(24, 24), function() regionPopup.Visible = false end, C.cream, 17)
 	local regionList = scroll(regionPopup, "Regions", UDim2.fromOffset(12, 53), UDim2.new(1, -24, 1, -62)); regionList.ZIndex = 16; listLayout(regionList, 6)
 	local function renderRegions()
 		clear(regionList)
 		local query = fold(regionSearch.Text)
-		for _, offer in ipairs(Config.Operators[selectedOperator].Codes) do
-			if query == "" or string.find(fold(offer.Region), query, 1, true) or string.find(offer.Code, query, 1, true) then
-				local profile = Config.Profiles[offer.ProfileId]
-				local b = button(regionList, "Code" .. offer.Code, "", UDim2.fromOffset(0, 0), UDim2.new(1, -8, 0, 58), function() selectOffer(offer); regionPopup.Visible = false end, C.cream, 17)
-				badge(b, "Code", "+7 " .. offer.Code, 10, 17, 65, C.pale).ZIndex = 18
+		for _, offer in ipairs(Config.GetRegionOffers(Config.Operators[selectedOperator].Id)) do
+			if query == "" or string.find(fold(offer.Region), query, 1, true) then
+				local b = button(regionList, offer.Id, "", UDim2.fromOffset(0, 0), UDim2.new(1, -8, 0, 58), function() selectOffer(offer); regionPopup.Visible = false end, C.cream, 17)
+				badge(b, "Kind", offer.Kind == "City" and "ГОРОД" or "РЕГИОН", 10, 17, 65, C.pale).ZIndex = 18
 				label(b, "Region", offer.Region, UDim2.fromOffset(86, 6), UDim2.new(1, -192, 0, 25), 14, C.ink, true, 18)
-				label(b, "Profile", profile.Name, UDim2.fromOffset(86, 30), UDim2.new(1, -190, 0, 18), 11, C.muted, false, 18)
-				local price = label(b, "Price", money(profile.Price) .. " ₽", UDim2.new(1, -100, 0, 14), UDim2.fromOffset(90, 30), 14, C.blue, true, 18)
+				label(b, "Profile", "Код подберёт станция", UDim2.fromOffset(86, 30), UDim2.new(1, -190, 0, 18), 11, C.muted, false, 18)
+				local price = label(b, "Price", money(offer.Price) .. " ₽", UDim2.new(1, -100, 0, 14), UDim2.fromOffset(90, 30), 14, C.blue, true, 18)
 				price.TextXAlignment = Enum.TextXAlignment.Right
 			end
 		end
@@ -362,22 +367,23 @@ function DesktopUI.Start()
 	selectOffer = function(offer)
 		if spinBusy then return end
 		selectedOffer = offer
-		local info = Config.CodeOffers[offer.Code]; local profile = Config.Profiles[offer.ProfileId]
-		codeButton.Text = info.Region .. "  ·  +7 (" .. offer.Code .. ")  v"
+		local info = Config.OperatorById[offer.OperatorId]
+		codeButton.Text = offer.Region .. "  ·  " .. money(offer.Price) .. " ₽  v"
 		if not lastItem then
-			ticketBrand.Text = info.OperatorName .. " / АБОНЕНТСКАЯ КАРТОЧКА"
-			number.Text = "+7 (" .. offer.Code .. ") •••-••-••"
+			ticketBrand.Text = info.Name .. " / АБОНЕНТСКАЯ КАРТОЧКА"
+			number.Text = "+7 (9••) •••-••-••"
+			operatorRibbon.BackgroundColor3 = info.ThemeColor; ticketStroke.Color = info.ThemeColor
 		end
-		local minimum = 1
-		for i, weight in ipairs(profile.Weights) do if weight > 0 then minimum = i; break end end
-		if not lastItem then resultDetails.Text = "Гарантия: " .. Config.Rarities[minimum].Name .. " и выше" end
+		if not lastItem then resultDetails.Text = "Все шесть редкостей · единые шансы" end
 		refreshControls()
 	end
 	selectOperator = function(index)
 		selectedOperator = index
-		for i, b in ipairs(operatorButtons) do b.BackgroundColor3 = i == index and C.pale or C.paper end
-		local preferred = Config.Operators[index].Codes[1]
-		for _, offer in ipairs(Config.Operators[index].Codes) do if offer.ProfileId == selectedOffer.ProfileId then preferred = offer; break end end
+		for i, b in ipairs(operatorButtons) do
+			b.BackgroundColor3 = Config.Operators[i].ThemeColor; b.TextColor3 = Config.Operators[i].TextColor
+			stroke(b, i == index and C.ink or C.line, i == index and 2 or 1)
+		end
+		local preferred = Config.ResolveRegion(Config.Operators[index].Id, selectedOffer.Id) or Config.GetDefaultOffer(Config.Operators[index].Id)
 		selectOffer(preferred); renderRegions()
 	end
 	codeButton.Activated:Connect(function() if not spinBusy then regionPopup.Visible = not regionPopup.Visible; renderRegions() end end)
@@ -395,9 +401,9 @@ function DesktopUI.Start()
 	local rarityFilter, sortMode = 0, 1
 	local rarityButton = button(cardsPane, "Rarity", "Все редкости", UDim2.new(1, -184, 0, 0), UDim2.fromOffset(184, 32), nil, C.paper)
 	local sortButton = button(cardsPane, "Sort", "Порядок: новые", UDim2.fromOffset(0, 40), UDim2.fromOffset(174, 27), nil)
-	label(cardsPane, "CardTip", "Нажмите на карточку — подробности и установка", UDim2.new(0, 188, 0, 40), UDim2.new(1, -188, 0, 27), 11, C.muted)
+	label(cardsPane, "CardTip", "SIM-карты · цвет рамки показывает редкость", UDim2.new(0, 188, 0, 40), UDim2.new(1, -188, 0, 27), 11, C.muted)
 	local cards = scroll(cardsPane, "Cards", UDim2.fromOffset(0, 77), UDim2.new(1, 0, 1, -77))
-	local cardGrid = create("UIGridLayout", cards, {CellSize = UDim2.new(0.5, -7, 0, 156), CellPadding = UDim2.fromOffset(10, 10), SortOrder = Enum.SortOrder.LayoutOrder})
+	local cardGrid = create("UIGridLayout", cards, {CellSize = UDim2.new(0.5, -7, 0, 174), CellPadding = UDim2.fromOffset(10, 10), SortOrder = Enum.SortOrder.LayoutOrder})
 	create("UIPadding", cards, {PaddingTop = UDim.new(0, 3), PaddingLeft = UDim.new(0, 3), PaddingRight = UDim.new(0, 5), PaddingBottom = UDim.new(0, 6)})
 	local emptyCards = label(cardsPane, "Empty", "", UDim2.fromOffset(18, 100), UDim2.new(1, -36, 0, 110), 17, C.muted)
 	emptyCards.TextXAlignment = Enum.TextXAlignment.Center; emptyCards.Visible = false
@@ -410,25 +416,20 @@ function DesktopUI.Start()
 	local slotTimers = {}
 	local function displayItem(item)
 		lastItem = item
+		local brand = Config.OperatorById[item.OperatorId]
+		operatorRibbon.BackgroundColor3 = brand and brand.ThemeColor or C.blue
+		ticket.BackgroundColor3 = (brand and brand.ThemeColor or C.blue):Lerp(C.paper, 0.96)
+		ticketStroke.Color = rarityColors[item.RarityIndex or 1] or C.line; ticketStroke.Thickness = 2
+		ticketStroke.Thickness = 4
+		TweenService:Create(ticketStroke, TweenInfo.new(0.55), {Thickness = 2}):Play()
+		number.TextTransparency = 0.35
+		TweenService:Create(number, TweenInfo.new(0.28), {TextTransparency = 0}):Play()
+		punch.Rotation = -6
+		TweenService:Create(punch, TweenInfo.new(0.35, Enum.EasingStyle.Back), {Rotation = 0}):Play()
 		number.Text = item.DisplayNumber or "+7 (---) --- -- --"
 		number.TextColor3 = rarityColors[item.RarityIndex or 1] or C.ink
 		ticketBrand.Text = (item.OperatorName or "NUMBER RUSH") .. " / " .. (item.Region or "КОЛЛЕКЦИЯ")
 		resultDetails.Text = (item.RarityName or "") .. "  ·  Оценка " .. money(item.SalePrice) .. " ₽\nВ слоте: " .. money(item.IncomePerHour) .. " ₽/ч"
-	end
-	local function itemDetails(item)
-		information("ПАСПОРТ SIM-КАРТЫ", {
-			(item.DisplayNumber or "") .. "\n" .. (item.RarityName or "") .. " · " .. (item.OperatorName or "") .. " · " .. (item.Region or ""),
-			"Оценочная стоимость: " .. money(item.SalePrice) .. " ₽\nДоход при установке: " .. money(item.IncomePerHour) .. " ₽/ч",
-			string.format("Расчёт: база %s ₽ × цифры %.2f × код %.2f × совпадение %.2f", money(item.BasePrice), item.DigitMultiplier or 1, item.PrestigeMultiplier or 1, item.CodeMatchMultiplier or 1),
-			item.Location == "IncomeSlot" and ("Установлен в доходный слот №" .. tostring(item.IncomeSlotIndex)) or "Номер находится в коллекции. Продажа системе пока не подключена.",
-		})
-		modalAction.Visible = true
-		modalAction.Text = item.Location == "IncomeSlot" and "ПОКАЗАТЬ ДОХОДНЫЕ СЛОТЫ" or "УСТАНОВИТЬ В ДОХОДНЫЙ СЛОТ"
-		modalContent.Size = UDim2.new(1, -36, 1, -112)
-		modalActionCallback = function()
-			selectedItemId = item.IssuanceId; modal.Visible = false; setCollectionMode("slots"); requestSlots("GetState")
-		end
-		modalContent.CanvasSize = UDim2.fromOffset(0, 304)
 	end
 	renderCollection = function()
 		clear(cards)
@@ -445,15 +446,27 @@ function DesktopUI.Start()
 			if (rarityFilter == 0 or item.RarityIndex == rarityFilter) and (query == "" or string.find(item.FullNumber or "", query, 1, true)) then
 				shown = shown + 1
 				local color = rarityColors[item.RarityIndex or 1] or C.muted
-				local card = button(cards, item.IssuanceId, "", UDim2.fromOffset(0, 0), UDim2.fromOffset(280, 156), function() itemDetails(item) end, C.paper)
-				card.LayoutOrder = shown; stroke(card, color)
-				frame(card, "Stripe", UDim2.fromOffset(0, 8), UDim2.new(0, 4, 1, -16), color, 4)
-				label(card, "Rarity", item.RarityName or "", UDim2.fromOffset(14, 9), UDim2.new(1, -24, 0, 19), 11, color, true, 4)
-				local phone = label(card, "Number", item.DisplayNumber or "", UDim2.fromOffset(13, 34), UDim2.new(1, -20, 0, 31), 20, C.ink, true, 4)
+				local brand = Config.OperatorById[item.OperatorId]
+				local primary = brand and brand.ThemeColor or C.blue
+				local card = frame(cards, item.IssuanceId, UDim2.fromOffset(0, 0), UDim2.fromOffset(280, 174), primary:Lerp(C.paper, 0.96))
+				card.LayoutOrder = shown; corner(card, 5); stroke(card, color, 2)
+				frame(card, "Stripe", UDim2.fromOffset(7, 34), UDim2.new(0, 4, 0, 32), primary, 4)
+				label(card, "Rarity", item.RarityName or "", UDim2.fromOffset(12, 7), UDim2.new(0.57, -12, 0, 21), 10, color, true, 4)
+				local value = label(card, "Price", money(item.SalePrice) .. " ₽", UDim2.new(0.57, 0, 0, 7), UDim2.new(0.43, -12, 0, 21), 12, C.ink, true, 4); value.TextXAlignment = Enum.TextXAlignment.Right
+				local sim = icon(card, "collection", primary); sim.Position = UDim2.fromOffset(16, 34); create("UIScale", sim, {Scale = 0.55})
+				label(card, "Operator", item.OperatorName or "", UDim2.fromOffset(48, 34), UDim2.new(1, -58, 0, 17), 12, primary == Config.Operators[1].ThemeColor and C.ink or primary, true, 4)
+				label(card, "Region", item.Region or "", UDim2.fromOffset(48, 51), UDim2.new(1, -58, 0, 20), 10, C.muted, false, 4)
+				local phone = label(card, "Number", item.DisplayNumber or "", UDim2.fromOffset(12, 77), UDim2.new(1, -24, 0, 27), cards.AbsoluteSize.X < 560 and 16 or 20, C.ink, true, 4)
 				phone.Font = Enum.Font.Code
-				label(card, "Operator", (item.OperatorName or "") .. " · " .. (item.Region or ""), UDim2.fromOffset(14, 68), UDim2.new(1, -25, 0, 27), 10, C.muted, false, 4)
-				label(card, "Value", money(item.SalePrice) .. " ₽  ·  " .. money(item.IncomePerHour) .. " ₽/ч", UDim2.fromOffset(14, 101), UDim2.new(1, -25, 0, 22), 12, C.ink, true, 4)
-				label(card, "Location", item.Location == "IncomeSlot" and ("В СЛОТЕ №" .. tostring(item.IncomeSlotIndex)) or "ОТКРЫТЬ ПАСПОРТ  →", UDim2.fromOffset(14, 130), UDim2.new(1, -25, 0, 16), 10, item.Location == "IncomeSlot" and C.green or C.blue, true, 4)
+				label(card, "Income", money(item.IncomePerHour) .. " ₽/ч в слоте", UDim2.fromOffset(12, 108), UDim2.new(1, -24, 0, 20), 12, C.green, true, 4)
+				local digits = label(card, "Digits", string.format("# ×%.2f", item.DigitMultiplier or 1), UDim2.fromOffset(12, 139), UDim2.new(0.48, -12, 0, 25), 12, C.green, true, 4)
+				local tip = frame(card, "PriceTip", UDim2.fromOffset(10, 46), UDim2.new(1, -20, 0, 80), C.cream, 8); corner(tip, 4); stroke(tip, color); tip.Visible = false
+				label(tip, "Formula", string.format("Цифры ×%.2f\nСерия ×%.2f\nСовпадение ×%.2f", item.DigitMultiplier or 1, item.PrestigeMultiplier or 1, item.CodeMatchMultiplier or 1), UDim2.fromOffset(9, 5), UDim2.new(1, -18, 1, -10), 12, C.ink, false, 9)
+				digits.MouseEnter:Connect(function() tip.Visible = true end)
+				digits.MouseLeave:Connect(function() tip.Visible = false end)
+				button(card, "Assign", item.Location == "IncomeSlot" and ("Слот №" .. tostring(item.IncomeSlotIndex)) or "В доход", UDim2.new(0.51, 0, 0, 137), UDim2.new(0.49, -12, 0, 27), function()
+					selectedItemId = item.IssuanceId; setCollectionMode("slots")
+				end, C.pale, 5)
 			end
 		end
 		emptyCards.Visible = shown == 0
@@ -466,7 +479,7 @@ function DesktopUI.Start()
 	renderSlots = function()
 		clear(slotRows); table.clear(slotTimers)
 		local item = getSelectedItem()
-		slotSelection.Text = item and ("Выбрано: " .. item.DisplayNumber) or "Откройте паспорт SIM-карты, чтобы выбрать её для установки."
+		slotSelection.Text = item and ("Выбрано: " .. item.DisplayNumber) or "Нажмите «В доход» на нужной SIM-карте."
 		enabled(slotRefresh, not slotBusy and player:GetAttribute("DataReady") == true)
 		enabled(equipBest, slotState ~= nil and not slotBusy and not spinBusy and not slotUncertain and player:GetAttribute("DataReady") == true)
 		if not slotState then
@@ -511,7 +524,7 @@ function DesktopUI.Start()
 		collectionMode = mode; cardsPane.Visible = mode == "numbers"; slotsPane.Visible = mode == "slots"
 		collectionTabs.numbers.BackgroundColor3 = mode == "numbers" and C.pale or C.cream
 		collectionTabs.slots.BackgroundColor3 = mode == "slots" and C.pale or C.cream
-		if mode == "slots" then renderSlots(); requestSlots("GetState") else cards.CanvasPosition = Vector2.zero; renderCollection(); status.Text = "Ваши SIM-карты · поиск, сортировка и паспорта номеров" end
+		if mode == "slots" then renderSlots(); requestSlots("GetState") else cards.CanvasPosition = Vector2.zero; renderCollection(); status.Text = "Ваши SIM-карты · поиск, сортировка и доходные линии" end
 	end
 	search:GetPropertyChangedSignal("Text"):Connect(function()
 		local digits = search.Text:gsub("%D", "")
@@ -712,13 +725,26 @@ function DesktopUI.Start()
 	local mail = pages.mail
 	local mailNews, mailRewards
 	local mailContent = scroll(mail, "Messages", UDim2.fromOffset(0, 45), UDim2.new(1, 0, 1, -45))
-	local function renderMail(rewards)
+	local function renderMail(rewards, activeArticle)
 		clear(mailContent)
 		mailNews.BackgroundColor3 = rewards and C.cream or C.pale; mailRewards.BackgroundColor3 = rewards and C.pale or C.cream
-		label(mailContent, "Title", rewards and "СИСТЕМНЫЕ НАГРАДЫ" or "НОВЫЙ РАБОЧИЙ СТОЛ NUMBER RUSH", UDim2.fromOffset(12, 12), UDim2.new(1, -24, 0, 50), 22, C.blue, true)
-		label(mailContent, "Body", rewards and "Наград к получению пока нет.\n\nСистема выдачи подарков ещё не подключена. Новости не создают денежные выплаты."
-			or "15 ноября 2026\n\nДобро пожаловать в абонентский отдел!\n\n• Полноценный рабочий стол и компактный терминал показывают одну прокрутку.\n\n• Список номеров и инвентарь бустов разделены.\n\n• Доходные слоты можно менять без часового ожидания.\n\n• «Закрепить лучшее» подбирает максимальный доход из ваших номеров.", UDim2.fromOffset(12, 79), UDim2.new(1, -24, 0, 340), 16, C.ink).TextYAlignment = Enum.TextYAlignment.Top
-		mailContent.CanvasSize = UDim2.fromOffset(0, 430)
+		mailContent.CanvasPosition = Vector2.zero
+		if rewards then
+			label(mailContent, "Title", "СИСТЕМНЫЕ НАГРАДЫ", UDim2.fromOffset(12, 12), UDim2.new(1, -24, 0, 50), 22, C.blue, true)
+			label(mailContent, "Body", "Наград к получению пока нет.\n\nСистема выдачи подарков ещё не подключена.", UDim2.fromOffset(12, 79), UDim2.new(1, -24, 0, 180), 16, C.ink).TextYAlignment = Enum.TextYAlignment.Top
+			mailContent.CanvasSize = UDim2.fromOffset(0, 270); return
+		end
+		local y = 3
+		for i, article in ipairs(News) do
+			button(mailContent, article.Id, article.Title .. "\n" .. article.Date, UDim2.fromOffset(3, y), UDim2.new(1, -10, 0, 60), function() renderMail(false, i) end, i == (activeArticle or 1) and C.pale or C.paper)
+			y = y + 72
+			if i == (activeArticle or 1) then
+				local height = game:GetService("TextService"):GetTextSize(article.Body, 15, Enum.Font.Arial, Vector2.new(math.max(260, mailContent.AbsoluteSize.X - 30), 10000)).Y + 12
+				local text = label(mailContent, "ArticleBody", article.Body, UDim2.fromOffset(12, y), UDim2.new(1, -30, 0, height), 15, C.ink)
+				text.TextYAlignment = Enum.TextYAlignment.Top; y = y + height + 16
+			end
+		end
+		mailContent.CanvasSize = UDim2.fromOffset(0, y + 8)
 	end
 	mailNews = button(mail, "News", "НОВОСТИ", UDim2.fromOffset(0, 0), UDim2.fromOffset(140, 32), function() renderMail(false) end, C.pale)
 	mailRewards = button(mail, "Rewards", "НАГРАДЫ", UDim2.fromOffset(148, 0), UDim2.fromOffset(140, 32), function() renderMail(true) end)
@@ -763,6 +789,7 @@ function DesktopUI.Start()
 	button(compact, "Expand", "↑", UDim2.new(1, -38, 0, 3), UDim2.fromOffset(30, 24), function() setExpanded(true); showPage("terminal") end, C.pale, 24)
 	number:GetPropertyChangedSignal("Text"):Connect(function() miniNumber.Text = number.Text end)
 	number:GetPropertyChangedSignal("TextColor3"):Connect(function() miniNumber.TextColor3 = number.TextColor3 end)
+	number:GetPropertyChangedSignal("TextTransparency"):Connect(function() miniNumber.TextTransparency = number.TextTransparency end)
 	status:GetPropertyChangedSignal("Text"):Connect(function()
 		miniStatus.Text = spinBusy and status.Text or lastItem and ((lastItem.RarityName or "") .. " · оценка " .. money(lastItem.SalePrice) .. " ₽") or "Одна выдача · один платёж"
 	end)
@@ -779,7 +806,7 @@ function DesktopUI.Start()
 	end
 	toggleStartMenu = function() if expanded then startMenu.Visible = not startMenu.Visible else setExpanded(true); startMenu.Visible = true end end
 	setExpanded = function(value)
-		expanded = value; wallpaper.Visible = value; sidebar.Visible = value; topbar.Visible = value; window.Visible = value
+		expanded = value; wallpaper.Visible = value; sidebar.Visible = true; topbar.Visible = value; window.Visible = value
 		compact.Visible = not value; startMenu.Visible = false
 		if not value then roster.Visible = false end
 		root:SetAttribute("Expanded", value)
@@ -788,12 +815,17 @@ function DesktopUI.Start()
 	-- Desktop routing and viewport layout: no changes to Roblox's native player list.
 	local pageTitles = {terminal = "ТЕРМИНАЛ ВЫДАЧИ", collection = "СПИСОК НОМЕРОВ", upgrades = "ПРОКАЧКА", trade = "ТОРГИ", quests = "ЗАДАНИЯ", top = "РЕЙТИНГ", shop = "МАГАЗИН", profile = "ПРОФИЛЬ АБОНЕНТА", boosts = "ИНВЕНТАРЬ БУСТОВ", mail = "ПОЧТА", settings = "НАСТРОЙКИ"}
 	showPage = function(key)
-		if not expanded then setExpanded(true) end
+		if key == "terminal" then
+			if not expanded then setExpanded(true) end
+		else
+			if expanded then setExpanded(false) end
+			compact.Visible = false
+		end
 		startMenu.Visible = false
 		modal.Visible = false; regionPopup.Visible = false; currentPage = key; window.Visible = true
 		windowTitle.Text = "NUMBER RUSH — " .. pageTitles[key]
 		for name, page in pairs(pages) do page.Visible = name == key end
-		for i, data in ipairs(menus) do menuButtons[i].BackgroundColor3 = C.blue; menuButtons[i].BackgroundTransparency = data[1] == key and 0.45 or 1 end
+		for i, data in ipairs(menus) do menuButtons[i].BackgroundColor3 = data[1] == key and C.pale or C.paper; menuButtons[i].BackgroundTransparency = 0 end
 		if key == "collection" then cards.CanvasPosition = Vector2.zero; renderCollection(); if collectionMode == "slots" then requestSlots("GetState") end end
 		if key == "top" then renderTop() end
 		if key == "profile" then renderProfile() end
@@ -803,18 +835,18 @@ function DesktopUI.Start()
 	layoutDesktop = function()
 		local size = root.AbsoluteSize; local narrow = size.X < 1050
 		local sideWidth = 164
-		sidebar.Size = UDim2.fromOffset(sideWidth, 432)
-		sidebar.Position = UDim2.fromOffset(10, 53)
-		sidebar.BackgroundTransparency = 1; sidebar:FindFirstChildOfClass("UIStroke").Transparency = 1
+		sidebar.Size = UDim2.fromOffset(sideWidth, 366)
+		sidebar.Position = UDim2.fromOffset(10, math.max(53, (size.Y - 366) / 2 - 15))
+		sidebar.BackgroundTransparency = 0.05; sidebar:FindFirstChildOfClass("UIStroke").Transparency = 0
 		menuLabel.Visible = false
 		for i, b in ipairs(menuButtons) do
-			b.Position = UDim2.fromOffset(4 + ((i - 1) % 2) * 79, math.floor((i - 1) / 2) * 71)
+			b.Position = UDim2.fromOffset(4 + ((i - 1) % 2) * 79, 5 + math.floor((i - 1) / 2) * 71)
 			b.Size = UDim2.fromOffset(75, 68)
 			b.Caption.Position = UDim2.fromOffset(0, 46); b.Caption.Size = UDim2.new(1, 0, 0, 20)
-			b.Caption.TextSize = 10; b.Caption.TextColor3 = Color3.new(1, 1, 1); b.Caption.TextStrokeTransparency = 0.5
+			b.Caption.TextSize = 10; b.Caption.TextColor3 = C.ink; b.Caption.TextStrokeTransparency = 1
 			b.Icon.Position = UDim2.new(0.5, -24, 0, 0)
-			b.BackgroundColor3 = C.blue; b.BackgroundTransparency = menus[i][1] == currentPage and 0.45 or 1
-			b:FindFirstChildOfClass("UIStroke").Transparency = 1
+			b.BackgroundColor3 = menus[i][1] == currentPage and C.pale or C.paper; b.BackgroundTransparency = 0
+			b:FindFirstChildOfClass("UIStroke").Transparency = 0.5
 		end
 		roster.Visible = expanded and (rosterPreference == nil and size.X >= 1250 or rosterPreference == true)
 		local left = sideWidth + 28; local right = roster.Visible and size.X >= 1250 and 194 or 16
@@ -833,10 +865,11 @@ function DesktopUI.Start()
 		hud.Position = UDim2.new(0.5, -hud.Size.X.Offset / 2, 1, -76)
 		if expanded then hud.Size = UDim2.new(1, 0, 0, 58); hud.Position = UDim2.new(0, 0, 1, -58) end
 		compact.Size = UDim2.fromOffset(math.min(620, size.X - 24), 98); compact.Position = UDim2.new(0.5, -compact.Size.X.Offset / 2, 1, -182)
+		if not expanded and size.X < 950 then compact.Size = UDim2.fromOffset(math.max(350, size.X - 200), 98); compact.Position = UDim2.new(1, -compact.Size.X.Offset - 10, 1, -182) end
 		balanceLabel.Size = UDim2.new(1, -460, 0, 32)
 		balanceLabel.TextSize = size.X < 700 and 22 or 26
 		local oneColumn = width < 480
-		cardGrid.CellSize = oneColumn and UDim2.new(1, -12, 0, 156) or UDim2.new(0.5, -7, 0, 156)
+		cardGrid.CellSize = oneColumn and UDim2.new(1, -12, 0, 174) or UDim2.new(0.5, -7, 0, 174)
 		number.TextSize = width < 540 and 26 or 32
 		local compact = height < 480
 		if compact then
@@ -875,15 +908,14 @@ function DesktopUI.Start()
 		local income = player:GetAttribute("IncomeEnabled") == true
 		rateLabel.Text = income and ("ДОХОД: " .. money(player:GetAttribute("TotalBaseIncomePerHour")) .. " ₽/ч") or "ДОХОД НЕАКТИВЕН"
 		capacityButton.Text = "SIM: " .. tostring(player:GetAttribute("InventoryCount") or #currentItems) .. "/" .. tostring(player:GetAttribute("InventoryCapacity") or Config.StartingInventoryCapacity)
-		local profile = Config.Profiles[selectedOffer.ProfileId]
 		local count = player:GetAttribute("InventoryCount") or 0
 		local capacity = player:GetAttribute("InventoryCapacity") or Config.StartingInventoryCapacity
-		local canSpin = connected and ready and not spinBusy and not slotBusy and balanceValue ~= nil and nextSequence >= 1 and balanceValue.Value >= profile.Price and count < capacity
+		local canSpin = connected and ready and not spinBusy and not slotBusy and balanceValue ~= nil and nextSequence >= 1 and balanceValue.Value >= selectedOffer.Price and count < capacity
 		enabled(spinButton, canSpin == true)
 		enabled(miniSpin, canSpin == true)
-		miniSpin.Text = spinBusy and "ВЫДАЧА..." or (money(profile.Price) .. " ₽\nКРУТИТЬ")
-		miniOffer.Text = Config.CodeOffers[selectedOffer.Code].OperatorName .. " · " .. selectedOffer.Region .. " · +7 (" .. selectedOffer.Code .. ")"
-		spinButton.Text = spinBusy and "ПОЛУЧАЕМ НОМЕР..." or count >= capacity and "КОЛЛЕКЦИЯ ЗАПОЛНЕНА" or ("ПОЛУЧИТЬ · " .. money(profile.Price) .. " ₽")
+		miniSpin.Text = spinBusy and "ВЫДАЧА..." or (money(selectedOffer.Price) .. " ₽\nКРУТИТЬ")
+		miniOffer.Text = selectedOffer.OperatorName .. " · " .. selectedOffer.Region
+		spinButton.Text = spinBusy and "ПОЛУЧАЕМ НОМЕР..." or count >= capacity and "КОЛЛЕКЦИЯ ЗАПОЛНЕНА" or ("ПОЛУЧИТЬ · " .. money(selectedOffer.Price) .. " ₽")
 		for _, b in ipairs(operatorButtons) do enabled(b, not spinBusy) end
 		enabled(codeButton, not spinBusy)
 		if balanceValue then
@@ -903,7 +935,11 @@ function DesktopUI.Start()
 				animationToken = animationToken + 1; local token = animationToken; local startedAt = os.clock()
 				task.spawn(function()
 					while spinBusy and token == animationToken and gui.Parent do
-						number.Text = string.format("+7 (%s) %03d-%02d-%02d", packet.Code, visualRandom:NextInteger(0, 999), visualRandom:NextInteger(0, 99), visualRandom:NextInteger(0, 99))
+						local phase = os.clock() - startedAt
+						punch.Rotation = math.sin(phase * 7) * 3
+						number.TextTransparency = 0.05 + math.abs(math.sin(phase * 5)) * 0.12
+						local codes = selectedOffer.Codes
+						number.Text = string.format("+7 (%s) %03d-%02d-%02d", codes[visualRandom:NextInteger(1, #codes)], visualRandom:NextInteger(0, 999), visualRandom:NextInteger(0, 99), visualRandom:NextInteger(0, 99))
 						local left = math.ceil(math.max(0, (packet.Duration or Config.SpinDuration) - (os.clock() - startedAt)))
 						status.Text = left > 0 and ("Станция подбирает номер... " .. left .. " сек.") or "Подтверждаем выдачу и сохранение..."
 						task.wait(0.08)
@@ -914,6 +950,7 @@ function DesktopUI.Start()
 			if packet.Status == "Error" and packet.ErrorCode == "Busy" and spinBusy and spinStarted then return end
 			if packet.Status ~= "Success" and packet.Status ~= "Error" and packet.Status ~= "Cancelled" then return end
 			animationToken = animationToken + 1; spinBusy = false; spinStarted = false; activeSequence = nil
+			punch.Rotation = 0; number.TextTransparency = 0
 			if packet.Status == "Success" and packet.Item then
 				displayItem(packet.Item); status.Text = "Номер выдан и сохранён. Откройте коллекцию для установки в слот."
 			elseif packet.Status == "Cancelled" then
@@ -935,11 +972,13 @@ function DesktopUI.Start()
 	beginSpin = function()
 		if not spinButton.Interactable or spinBusy or not connected then return end
 		spinBusy = true; spinStarted = false; activeSequence = nextSequence; regionPopup.Visible = false
-		local code, sequence = selectedOffer.Code, activeSequence
-		ticketBrand.Text = Config.CodeOffers[code].OperatorName .. " / АБОНЕНТСКАЯ КАРТОЧКА"
+		local operatorId, regionId, sequence = selectedOffer.OperatorId, selectedOffer.Id, activeSequence
+		local brand = Config.OperatorById[operatorId]
+		ticketBrand.Text = brand.Name .. " / " .. selectedOffer.Region
+		operatorRibbon.BackgroundColor3 = brand.ThemeColor; ticketStroke.Color = brand.ThemeColor
 		resultDetails.Text = "Запрос отправлен на станцию"; number.TextColor3 = C.ink
 		status.Text = "Подключаемся к оператору..."; refreshControls()
-		requestRemote:FireServer(code, sequence)
+		requestRemote:FireServer(operatorId, regionId, sequence)
 		task.delay(60, function()
 			if spinBusy and activeSequence == sequence then
 				animationToken = animationToken + 1
