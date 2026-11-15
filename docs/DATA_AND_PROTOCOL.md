@@ -61,6 +61,8 @@ Session.Token/LeaseUntil/Busy/Closing/SpinBusy/RequestBusy/NeedsRecovery/Balance
 | SpinResult Success | Сервер → клиент | Status, Sequence, Balance, Item, NextSequence, InventoryCount |
 | SpinResult Cancelled | Сервер → клиент | Status, Sequence, Balance, Reason, NextSequence, InventoryCount |
 | SpinResult Error | Сервер → клиент | Status, ErrorCode, Sequence?, Message, NextSequence?, Ready |
+| SlotRequest | Клиент → сервер | Подготовлен для шага 28, обработчик и контракт ещё не реализованы |
+| SlotResult | Сервер → клиент | Подготовлен для шага 28, обработчик и контракт ещё не реализованы |
 
 Предварительные ошибки могут не иметь Sequence. Клиент игнорирует Busy во время ожидания текущей операции. Таймаут UI 60 секунд показывает задержку, но не отправляет новый платёж и не включает кнопку для повторного списания.
 

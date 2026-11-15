@@ -17,9 +17,9 @@
 | Общий реестр номеров | Да | UpdateAsync Reserve/Confirm/Cancel; гонки и массовое исчерпание не проверены |
 | PendingSpin и восстановление | Да | Логика есть, отказные сценарии ещё не проверены |
 | Сохранение коллекции | Да, сериализация и восстановление Folder | Пользователь подтвердил сохранённый номер и баланс после перезапуска (шаг 26) |
-| Просмотр/фильтры коллекции | Подготовлен CollectionUI | Список, поиск по цифрам, переключение редкости; установка и проверка в Studio ещё не подтверждены |
+| Просмотр/фильтры коллекции | Да, CollectionUI | Пользователь подтвердил работу шага 27; список, поиск по цифрам, переключение редкости |
 | Продажа системе | Нет | Рассчитывается SalePrice, но операция продажи отсутствует |
-| Три доходных слота | Только поля профиля | Установка, таймер и начисление отсутствуют |
+| Три доходных слота | Поля профиля и подготовленные RemoteEvent | SlotRequest/SlotResult для шага 28; обработчики, установка, таймер и начисление отсутствуют |
 | Офлайн-доход | Нет | 75%, квота 8 ч/24 ч — план v0.2 |
 | Кабинеты, SIM-боксы, телефоны | Нет | Только исходная площадка и Spawn; цель — 6 кабинетов |
 | Лимит 6 игроков | Требование | Настройку Max Players в Dashboard пользователь не подтверждал |
@@ -34,9 +34,9 @@
 
 ## Текущее дерево Studio
 
-- ReplicatedStorage: ModuleScript `GameConfig`; Folder `NumberRushRemotes` с RemoteEvent `SpinRequest`, `SpinResult`.
+- ReplicatedStorage: ModuleScript `GameConfig`; Folder `NumberRushRemotes` с RemoteEvent `SpinRequest`, `SpinResult`; шаг 28 добавляет `SlotRequest`, `SlotResult` (пока без обработчиков).
 - ServerScriptService: Script `GameServer`; ModuleScript `NumberRules`, `NumberGenerator`, `NumberEconomy`, `PlayerDataStore`, `NumberRegistry`, `SpinService`.
-- StarterPlayer/StarterPlayerScripts: LocalScript `NumberRushUI`; для шага 27 добавить отдельный LocalScript `CollectionUI`.
+- StarterPlayer/StarterPlayerScripts: LocalScript `NumberRushUI` и `CollectionUI`.
 - У игрока после загрузки: Folder `leaderstats` с IntValue `Рубли`, Folder `NumberInventory`, атрибуты готовности и лимитов.
 - В локальной Studio также есть выключенные обычные Script `DataStoreCheck`, `NumberRulesTest`, `BalanceSaveTest`. В рабочую сборку репозитория они не включены.
 

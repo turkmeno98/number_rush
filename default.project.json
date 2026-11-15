@@ -18,6 +18,12 @@
         },
         "SpinResult": {
           "$className": "RemoteEvent"
+        },
+        "SlotRequest": {
+          "$className": "RemoteEvent"
+        },
+        "SlotResult": {
+          "$className": "RemoteEvent"
         }
       }
     },

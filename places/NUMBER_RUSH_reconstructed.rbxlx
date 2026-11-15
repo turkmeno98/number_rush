@@ -5,14 +5,14 @@
   <Item class="Workspace" referent="RBX00000001">
     <Properties>
       <string name="Name">Workspace</string>
-      <Ref name="CurrentCamera">RBX00000025</Ref>
+      <Ref name="CurrentCamera">RBX00000027</Ref>
     </Properties>
-    <Item class="Terrain" referent="RBX00000022">
+    <Item class="Terrain" referent="RBX00000024">
       <Properties>
         <string name="Name">Terrain</string>
       </Properties>
     </Item>
-    <Item class="Part" referent="RBX00000023">
+    <Item class="Part" referent="RBX00000025">
       <Properties>
         <string name="Name">Baseplate</string>
         <bool name="Anchored">true</bool>
@@ -37,7 +37,7 @@
         </CoordinateFrame>
       </Properties>
     </Item>
-    <Item class="SpawnLocation" referent="RBX00000024">
+    <Item class="SpawnLocation" referent="RBX00000026">
       <Properties>
         <string name="Name">SpawnLocation</string>
         <bool name="Anchored">true</bool>
@@ -63,7 +63,7 @@
         </CoordinateFrame>
       </Properties>
     </Item>
-    <Item class="Camera" referent="RBX00000025">
+    <Item class="Camera" referent="RBX00000027">
       <Properties>
         <string name="Name">Camera</string>
         <CoordinateFrame name="CFrame">
@@ -128,8 +128,18 @@
           <string name="Name">SpinResult</string>
         </Properties>
       </Item>
+      <Item class="RemoteEvent" referent="RBX00000012">
+        <Properties>
+          <string name="Name">SlotRequest</string>
+        </Properties>
+      </Item>
+      <Item class="RemoteEvent" referent="RBX00000013">
+        <Properties>
+          <string name="Name">SlotResult</string>
+        </Properties>
+      </Item>
     </Item>
-    <Item class="ModuleScript" referent="RBX00000012">
+    <Item class="ModuleScript" referent="RBX00000014">
       <Properties>
         <string name="Name">GameConfig</string>
         <ProtectedString name="Source">local Config = {}
@@ -218,7 +228,7 @@ return Config
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Script" referent="RBX00000013">
+    <Item class="Script" referent="RBX00000015">
       <Properties>
         <string name="Name">GameServer</string>
         <ProtectedString name="Source">local Players = game:GetService("Players")
@@ -441,7 +451,7 @@ end)
 </ProtectedString>
       </Properties>
     </Item>
-    <Item class="ModuleScript" referent="RBX00000014">
+    <Item class="ModuleScript" referent="RBX00000016">
       <Properties>
         <string name="Name">NumberEconomy</string>
         <ProtectedString name="Source">local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -478,7 +488,7 @@ return NumberEconomy
 </ProtectedString>
       </Properties>
     </Item>
-    <Item class="ModuleScript" referent="RBX00000015">
+    <Item class="ModuleScript" referent="RBX00000017">
       <Properties>
         <string name="Name">NumberGenerator</string>
         <ProtectedString name="Source">local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -570,7 +580,7 @@ return NumberGenerator
 </ProtectedString>
       </Properties>
     </Item>
-    <Item class="ModuleScript" referent="RBX00000016">
+    <Item class="ModuleScript" referent="RBX00000018">
       <Properties>
         <string name="Name">NumberRegistry</string>
         <ProtectedString name="Source">local DataStoreService = game:GetService("DataStoreService")
@@ -655,7 +665,7 @@ return NumberRegistry
 </ProtectedString>
       </Properties>
     </Item>
-    <Item class="ModuleScript" referent="RBX00000017">
+    <Item class="ModuleScript" referent="RBX00000019">
       <Properties>
         <string name="Name">NumberRules</string>
         <ProtectedString name="Source">local NumberRules = {}
@@ -697,7 +707,7 @@ return NumberRules
 </ProtectedString>
       </Properties>
     </Item>
-    <Item class="ModuleScript" referent="RBX00000018">
+    <Item class="ModuleScript" referent="RBX00000020">
       <Properties>
         <string name="Name">PlayerDataStore</string>
         <ProtectedString name="Source">local DataStoreService = game:GetService("DataStoreService")
@@ -803,7 +813,7 @@ return PlayerDataStore
 </ProtectedString>
       </Properties>
     </Item>
-    <Item class="ModuleScript" referent="RBX00000019">
+    <Item class="ModuleScript" referent="RBX00000021">
       <Properties>
         <string name="Name">SpinService</string>
         <ProtectedString name="Source">local HttpService = game:GetService("HttpService")
@@ -1001,7 +1011,7 @@ return SpinService
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="LocalScript" referent="RBX00000020">
+      <Item class="LocalScript" referent="RBX00000022">
         <Properties>
           <string name="Name">CollectionUI</string>
           <ProtectedString name="Source">-- Read-only collection view. Ownership and money remain server-authoritative.
@@ -1260,7 +1270,7 @@ if existingInventory then bindInventory(existingInventory) else queueRender() en
 </ProtectedString>
         </Properties>
       </Item>
-      <Item class="LocalScript" referent="RBX00000021">
+      <Item class="LocalScript" referent="RBX00000023">
         <Properties>
           <string name="Name">NumberRushUI</string>
           <ProtectedString name="Source">local Players = game:GetService("Players")

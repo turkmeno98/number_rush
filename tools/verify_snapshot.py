@@ -31,6 +31,9 @@ for entry in manifest['sources']:
     assert source==file.read_text(),entry
 for path in manifest['remote_events']:
     assert instances[path].get('class')=='RemoteEvent'
+assert len(manifest['remote_events'])==4
+assert 'ReplicatedStorage/NumberRushRemotes/SlotRequest' in instances
+assert 'ReplicatedStorage/NumberRushRemotes/SlotResult' in instances
 for name in manifest['excluded_disabled_scripts']:
     assert f'ServerScriptService/{name}' not in instances
 config=(ROOT/'src/ReplicatedStorage/GameConfig.lua').read_text()
@@ -62,5 +65,5 @@ assert 'CollectionUI' in project['tree']['StarterPlayer']['StarterPlayerScripts'
 assert (ROOT/'docs/HANDOFF.md').is_file()
 assert (ROOT/'docs/BALANCE_V02.md').is_file()
 assert (ROOT/'AGENTS.md').is_file()
-print('PASS: 10 source hashes and XML Source roundtrips; instance classes; read-only CollectionUI included; 2 RemoteEvents; disabled probes excluded; 12 unique codes; 3 weight totals; checkpoint documents.')
+print('PASS: 10 source hashes and XML Source roundtrips; instance classes; read-only CollectionUI included; 4 RemoteEvents (slot handlers pending); disabled probes excluded; 12 unique codes; 3 weight totals; checkpoint documents.')
 print('Not executed: Luau runtime, Studio import, DataStore operations, multiplayer fault cases.')

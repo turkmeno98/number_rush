@@ -23,6 +23,8 @@
 | ReplicatedStorage/NumberRushRemotes | Folder | создать |
 | …/SpinRequest | RemoteEvent | создать |
 | …/SpinResult | RemoteEvent | создать |
+| …/SlotRequest | RemoteEvent | создать; обработчик ещё не реализован |
+| …/SlotResult | RemoteEvent | создать; обработчик ещё не реализован |
 | ServerScriptService/GameServer | Script | src/ServerScriptService/GameServer.server.lua |
 | ServerScriptService/NumberRules | ModuleScript | src/ServerScriptService/NumberRules.lua |
 | ServerScriptService/NumberGenerator | ModuleScript | src/ServerScriptService/NumberGenerator.lua |
