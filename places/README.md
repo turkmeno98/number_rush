@@ -1,6 +1,6 @@
 # Сцены
 
-`NUMBER_RUSH_reconstructed.rbxlx` собран из текущих исходников через `tools/build_place.py`: девять скриптов, два RemoteEvent, простые Baseplate и SpawnLocation. XML и совпадение Source проверяются автоматически, импорт в Roblox Studio ещё предстоит подтвердить.
+`NUMBER_RUSH_reconstructed.rbxlx` собран из текущих исходников через `tools/build_place.py`: десять скриптов, два RemoteEvent, простые Baseplate и SpawnLocation. XML и совпадение Source проверяются автоматически, импорт в Roblox Studio ещё предстоит подтвердить.
 
 Это **не оригинальный экспорт** пользовательского NUMBER_RUSH.rbxl. Точный `.rbxl` остаётся на компьютере пользователя и будет добавлен после передачи файла. Roblox DataStore и настройки опубликованной игры сюда не входят.
 

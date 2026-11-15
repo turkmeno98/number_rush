@@ -21,7 +21,7 @@ def walk(parent,prefix=''):
         instances[path]=item
         walk(item,path)
 walk(tree.getroot())
-assert len(manifest['sources'])==9
+assert len(manifest['sources'])==10
 for entry in manifest['sources']:
     file=ROOT/entry['source']
     assert hashlib.sha256(file.read_bytes()).hexdigest()==entry['sha256'],file
@@ -51,8 +51,16 @@ assert 'WaitForChild("leaderstats", 30)' in ui
 assert 'requestRemote:FireServer(code, sequence)' in ui
 assert 'WindowScale' not in ui
 assert 'SetCoreGuiEnabled' not in ui
+collection_path='StarterPlayer/StarterPlayerScripts/CollectionUI'
+assert instances[collection_path].get('class')=='LocalScript'
+collection=(ROOT/'src/StarterPlayer/StarterPlayerScripts/CollectionUI.client.lua').read_text()
+assert 'FireServer' not in collection
+assert 'DataStoreService' not in collection
+assert 'NumberInventory' in collection
+assert 'AttributeChanged:Connect(queueRender)' in collection
+assert 'CollectionUI' in project['tree']['StarterPlayer']['StarterPlayerScripts']
 assert (ROOT/'docs/HANDOFF.md').is_file()
 assert (ROOT/'docs/BALANCE_V02.md').is_file()
 assert (ROOT/'AGENTS.md').is_file()
-print('PASS: 9 source hashes and XML Source roundtrips; instance classes; 2 RemoteEvents; disabled probes excluded; 12 unique codes; 3 weight totals; checkpoint documents.')
+print('PASS: 10 source hashes and XML Source roundtrips; instance classes; read-only CollectionUI included; 2 RemoteEvents; disabled probes excluded; 12 unique codes; 3 weight totals; checkpoint documents.')
 print('Not executed: Luau runtime, Studio import, DataStore operations, multiplayer fault cases.')

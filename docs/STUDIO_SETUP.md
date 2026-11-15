@@ -31,6 +31,7 @@
 | ServerScriptService/NumberRegistry | ModuleScript | src/ServerScriptService/NumberRegistry.lua |
 | ServerScriptService/SpinService | ModuleScript | src/ServerScriptService/SpinService.lua |
 | StarterPlayer/StarterPlayerScripts/NumberRushUI | LocalScript | src/StarterPlayer/StarterPlayerScripts/NumberRushUI.client.lua |
+| StarterPlayer/StarterPlayerScripts/CollectionUI | LocalScript | src/StarterPlayer/StarterPlayerScripts/CollectionUI.client.lua |
 
 В Studio имена **без расширений**. Вставлять Source целиком, сохраняя тип и регистр. При правках остановить Play, Ctrl+S; изменение тестовой копии во время Play не является сохранением редакторского исходника.
 

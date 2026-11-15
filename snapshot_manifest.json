@@ -1,5 +1,5 @@
 {
-  "checkpoint": "2026-11-15-after-step-25",
+  "checkpoint": "2026-11-15-after-step-26-collection-view-prepared",
   "provenance": "Reconstructed from latest conversation code, not exported from user Studio",
   "original_rbxl_received": false,
   "generated_place": "places/NUMBER_RUSH_reconstructed.rbxlx",
@@ -51,6 +51,12 @@
       "studio_path": "ServerScriptService/SpinService",
       "class": "ModuleScript",
       "sha256": "a9f39b511eb4a25452944329a965bfb7c58455baa12e6a50ee662ebee3879673"
+    },
+    {
+      "source": "src/StarterPlayer/StarterPlayerScripts/CollectionUI.client.lua",
+      "studio_path": "StarterPlayer/StarterPlayerScripts/CollectionUI",
+      "class": "LocalScript",
+      "sha256": "90ade5351dd0f8ccb7970a59a713759f76d4309dfb188bf6d294b6917fe3900c"
     },
     {
       "source": "src/StarterPlayer/StarterPlayerScripts/NumberRushUI.client.lua",

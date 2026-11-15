@@ -16,8 +16,8 @@
 | RemoteEvent запрос/ответ | Да | Первая настоящая прокрутка подтверждена |
 | Общий реестр номеров | Да | UpdateAsync Reserve/Confirm/Cancel; гонки и массовое исчерпание не проверены |
 | PendingSpin и восстановление | Да | Логика есть, отказные сценарии ещё не проверены |
-| Сохранение коллекции | Да, сериализация и восстановление Folder | Требуется отдельная проверка номера после перезапуска — следующий шаг |
-| Просмотр/фильтры коллекции | Нет | Только счётчик и последняя карточка результата |
+| Сохранение коллекции | Да, сериализация и восстановление Folder | Пользователь подтвердил сохранённый номер и баланс после перезапуска (шаг 26) |
+| Просмотр/фильтры коллекции | Подготовлен CollectionUI | Список, поиск по цифрам, переключение редкости; установка и проверка в Studio ещё не подтверждены |
 | Продажа системе | Нет | Рассчитывается SalePrice, но операция продажи отсутствует |
 | Три доходных слота | Только поля профиля | Установка, таймер и начисление отсутствуют |
 | Офлайн-доход | Нет | 75%, квота 8 ч/24 ч — план v0.2 |
@@ -36,7 +36,7 @@
 
 - ReplicatedStorage: ModuleScript `GameConfig`; Folder `NumberRushRemotes` с RemoteEvent `SpinRequest`, `SpinResult`.
 - ServerScriptService: Script `GameServer`; ModuleScript `NumberRules`, `NumberGenerator`, `NumberEconomy`, `PlayerDataStore`, `NumberRegistry`, `SpinService`.
-- StarterPlayer/StarterPlayerScripts: LocalScript `NumberRushUI`.
+- StarterPlayer/StarterPlayerScripts: LocalScript `NumberRushUI`; для шага 27 добавить отдельный LocalScript `CollectionUI`.
 - У игрока после загрузки: Folder `leaderstats` с IntValue `Рубли`, Folder `NumberInventory`, атрибуты готовности и лимитов.
 - В локальной Studio также есть выключенные обычные Script `DataStoreCheck`, `NumberRulesTest`, `BalanceSaveTest`. В рабочую сборку репозитория они не включены.
 

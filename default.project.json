@@ -29,6 +29,9 @@
       "$className": "StarterPlayer",
       "StarterPlayerScripts": {
         "$className": "StarterPlayerScripts",
+        "CollectionUI": {
+          "$path": "src/StarterPlayer/StarterPlayerScripts/CollectionUI.client.lua"
+        },
         "NumberRushUI": {
           "$path": "src/StarterPlayer/StarterPlayerScripts/NumberRushUI.client.lua"
         }

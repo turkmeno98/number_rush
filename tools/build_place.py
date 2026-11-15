@@ -107,7 +107,7 @@ def build():
     ET.ElementTree(root).write(output, encoding='utf-8', xml_declaration=True)
 
     manifest = {
-        'checkpoint': '2026-11-15-after-step-25',
+        'checkpoint': '2026-11-15-after-step-26-collection-view-prepared',
         'provenance': 'Reconstructed from latest conversation code, not exported from user Studio',
         'original_rbxl_received': False,
         'generated_place': output.relative_to(ROOT).as_posix(),
@@ -118,6 +118,10 @@ def build():
     (ROOT / 'snapshot_manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
 
     # Optional standard filesystem mapping. Rojo is not required for restoration.
+    client_tree = {'$className':'StarterPlayerScripts'}
+    for entry in entries:
+        if entry['studio_path'].startswith('StarterPlayer/StarterPlayerScripts/'):
+            client_tree[entry['studio_path'].rsplit('/',1)[1]] = {'$path':entry['source']}
     project = {'name':'NUMBER RUSH','tree':{
         '$className':'DataModel',
         'Workspace':{'$className':'Workspace','$ignoreUnknownInstances':True},
@@ -125,8 +129,7 @@ def build():
             'GameConfig':{'$path':'src/ReplicatedStorage/GameConfig.lua'},
             'NumberRushRemotes':{'$className':'Folder','SpinRequest':{'$className':'RemoteEvent'},'SpinResult':{'$className':'RemoteEvent'}}},
         'ServerScriptService':{'$className':'ServerScriptService','$path':'src/ServerScriptService'},
-        'StarterPlayer':{'$className':'StarterPlayer','StarterPlayerScripts':{
-            '$className':'StarterPlayerScripts','NumberRushUI':{'$path':'src/StarterPlayer/StarterPlayerScripts/NumberRushUI.client.lua'}}},
+        'StarterPlayer':{'$className':'StarterPlayer','StarterPlayerScripts':client_tree},
     }}
     (ROOT/'default.project.json').write_text(json.dumps(project,ensure_ascii=False,indent=2)+'\n')
     print(f'Built {output.relative_to(ROOT)} with {len(entries)} source scripts.')
