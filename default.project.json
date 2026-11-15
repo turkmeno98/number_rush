@@ -1,0 +1,38 @@
+{
+  "name": "NUMBER RUSH",
+  "tree": {
+    "$className": "DataModel",
+    "Workspace": {
+      "$className": "Workspace",
+      "$ignoreUnknownInstances": true
+    },
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "GameConfig": {
+        "$path": "src/ReplicatedStorage/GameConfig.lua"
+      },
+      "NumberRushRemotes": {
+        "$className": "Folder",
+        "SpinRequest": {
+          "$className": "RemoteEvent"
+        },
+        "SpinResult": {
+          "$className": "RemoteEvent"
+        }
+      }
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "$path": "src/ServerScriptService"
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "NumberRushUI": {
+          "$path": "src/StarterPlayer/StarterPlayerScripts/NumberRushUI.client.lua"
+        }
+      }
+    }
+  }
+}

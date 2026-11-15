@@ -1,0 +1,1374 @@
+<?xml version='1.0' encoding='utf-8'?>
+<roblox version="4">
+  <External>null</External>
+  <External>nil</External>
+  <Item class="Workspace" referent="RBX00000001">
+    <Properties>
+      <string name="Name">Workspace</string>
+      <Ref name="CurrentCamera">RBX00000024</Ref>
+    </Properties>
+    <Item class="Terrain" referent="RBX00000021">
+      <Properties>
+        <string name="Name">Terrain</string>
+      </Properties>
+    </Item>
+    <Item class="Part" referent="RBX00000022">
+      <Properties>
+        <string name="Name">Baseplate</string>
+        <bool name="Anchored">true</bool>
+        <Vector3 name="Size">
+          <X>512</X>
+          <Y>1</Y>
+          <Z>512</Z>
+        </Vector3>
+        <CoordinateFrame name="CFrame">
+          <X>0</X>
+          <Y>-0.5</Y>
+          <Z>0</Z>
+          <R00>1</R00>
+          <R01>0</R01>
+          <R02>0</R02>
+          <R10>0</R10>
+          <R11>1</R11>
+          <R12>0</R12>
+          <R20>0</R20>
+          <R21>0</R21>
+          <R22>1</R22>
+        </CoordinateFrame>
+      </Properties>
+    </Item>
+    <Item class="SpawnLocation" referent="RBX00000023">
+      <Properties>
+        <string name="Name">SpawnLocation</string>
+        <bool name="Anchored">true</bool>
+        <bool name="Neutral">true</bool>
+        <Vector3 name="Size">
+          <X>12</X>
+          <Y>1</Y>
+          <Z>12</Z>
+        </Vector3>
+        <CoordinateFrame name="CFrame">
+          <X>0</X>
+          <Y>0.5</Y>
+          <Z>0</Z>
+          <R00>1</R00>
+          <R01>0</R01>
+          <R02>0</R02>
+          <R10>0</R10>
+          <R11>1</R11>
+          <R12>0</R12>
+          <R20>0</R20>
+          <R21>0</R21>
+          <R22>1</R22>
+        </CoordinateFrame>
+      </Properties>
+    </Item>
+    <Item class="Camera" referent="RBX00000024">
+      <Properties>
+        <string name="Name">Camera</string>
+        <CoordinateFrame name="CFrame">
+          <X>32</X>
+          <Y>20</Y>
+          <Z>32</Z>
+          <R00>0.7071067811865475</R00>
+          <R01>-0.2858309752375147</R01>
+          <R02>0.6467616667635546</R02>
+          <R10>0</R10>
+          <R11>0.9146591207600471</R11>
+          <R12>0.40422604172722165</R12>
+          <R20>-0.7071067811865475</R20>
+          <R21>-0.2858309752375147</R21>
+          <R22>0.6467616667635546</R22>
+        </CoordinateFrame>
+        <CoordinateFrame name="Focus">
+          <X>0</X>
+          <Y>0</Y>
+          <Z>0</Z>
+          <R00>1</R00>
+          <R01>0</R01>
+          <R02>0</R02>
+          <R10>0</R10>
+          <R11>1</R11>
+          <R12>0</R12>
+          <R20>0</R20>
+          <R21>0</R21>
+          <R22>1</R22>
+        </CoordinateFrame>
+        <float name="FieldOfView">70</float>
+      </Properties>
+    </Item>
+  </Item>
+  <Item class="Players" referent="RBX00000002">
+    <Properties>
+      <string name="Name">Players</string>
+    </Properties>
+  </Item>
+  <Item class="Lighting" referent="RBX00000003">
+    <Properties>
+      <string name="Name">Lighting</string>
+      <float name="ClockTime">14</float>
+      <float name="Brightness">2</float>
+    </Properties>
+  </Item>
+  <Item class="ReplicatedStorage" referent="RBX00000004">
+    <Properties>
+      <string name="Name">ReplicatedStorage</string>
+    </Properties>
+    <Item class="Folder" referent="RBX00000009">
+      <Properties>
+        <string name="Name">NumberRushRemotes</string>
+      </Properties>
+      <Item class="RemoteEvent" referent="RBX00000010">
+        <Properties>
+          <string name="Name">SpinRequest</string>
+        </Properties>
+      </Item>
+      <Item class="RemoteEvent" referent="RBX00000011">
+        <Properties>
+          <string name="Name">SpinResult</string>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="ModuleScript" referent="RBX00000012">
+      <Properties>
+        <string name="Name">GameConfig</string>
+        <ProtectedString name="Source">local Config = {}
+
+Config.StartingBalance = 100000
+Config.StartingInventoryCapacity = 25
+Config.StartingIncomeSlots = 3
+Config.SpinDuration = 6
+
+Config.Rarities = {
+	{Name = "Обычный", BasePrice = 1500, IncomePerHour = 10000},
+	{Name = "Необычный", BasePrice = 1800, IncomePerHour = 11000},
+	{Name = "Редкий", BasePrice = 3000, IncomePerHour = 12500},
+	{Name = "Эпический", BasePrice = 6000, IncomePerHour = 15000},
+	{Name = "Легендарный", BasePrice = 15000, IncomePerHour = 18000},
+	{Name = "Исключительный", BasePrice = 40000, IncomePerHour = 22000},
+}
+
+Config.Profiles = {
+	Starter = {
+		Name = "Стартовый", Price = 5000, Prestige = 1.00,
+		Weights = {5500000, 4300000, 185000, 14900, 99, 1},
+	},
+	Improved = {
+		Name = "Улучшенный", Price = 15000, Prestige = 1.03,
+		Weights = {0, 9400000, 580000, 19900, 99, 1},
+	},
+	Collector = {
+		Name = "Коллекционный", Price = 50000, Prestige = 1.06,
+		Weights = {0, 0, 9700000, 297000, 2970, 30},
+	},
+}
+
+-- Сотые доли коэффициента: 200 = x2.00.
+Config.DigitValues = {
+	["0"] = 200, ["7"] = 190, ["8"] = 180, ["1"] = 165,
+	["9"] = 150, ["5"] = 140, ["3"] = 130, ["2"] = 120,
+	["6"] = 110, ["4"] = 100,
+}
+Config.CodeMatchPercent = 5
+
+-- Игровая привязка регионов, не реальная таблица диапазонов связи.
+Config.Operators = {
+	{Id = "beelink", Name = "БиЛайнк", Codes = {
+		{Code = "903", Region = "Москва", ProfileId = "Starter"},
+		{Code = "905", Region = "Санкт-Петербург", ProfileId = "Improved"},
+		{Code = "909", Region = "Казань", ProfileId = "Collector"},
+	}},
+	{Id = "mobitel", Name = "Мобител", Codes = {
+		{Code = "910", Region = "Москва", ProfileId = "Starter"},
+		{Code = "915", Region = "Санкт-Петербург", ProfileId = "Improved"},
+		{Code = "919", Region = "Казань", ProfileId = "Collector"},
+	}},
+	{Id = "megalink", Name = "МегаЛинк", Codes = {
+		{Code = "920", Region = "Москва", ProfileId = "Starter"},
+		{Code = "925", Region = "Санкт-Петербург", ProfileId = "Improved"},
+		{Code = "929", Region = "Казань", ProfileId = "Collector"},
+	}},
+	{Id = "telenova", Name = "ТелеНова", Codes = {
+		{Code = "900", Region = "Москва", ProfileId = "Starter"},
+		{Code = "904", Region = "Санкт-Петербург", ProfileId = "Improved"},
+		{Code = "951", Region = "Казань", ProfileId = "Collector"},
+	}},
+}
+
+Config.CodeOffers = {}
+for _, operator in Config.Operators do
+	for _, offer in operator.Codes do
+		assert(type(offer.Code) == "string" and offer.Code:match("^9%d%d$"), "Некорректный код в GameConfig")
+		assert(Config.CodeOffers[offer.Code] == nil, "Повторяющийся код: " .. offer.Code)
+		assert(Config.Profiles[offer.ProfileId] ~= nil, "Неизвестный профиль у кода " .. offer.Code)
+		Config.CodeOffers[offer.Code] = {
+			Code = offer.Code, Region = offer.Region,
+			OperatorId = operator.Id, OperatorName = operator.Name,
+			ProfileId = offer.ProfileId,
+		}
+	end
+end
+
+return Config
+</ProtectedString>
+      </Properties>
+    </Item>
+  </Item>
+  <Item class="ServerScriptService" referent="RBX00000005">
+    <Properties>
+      <string name="Name">ServerScriptService</string>
+    </Properties>
+    <Item class="Script" referent="RBX00000013">
+      <Properties>
+        <string name="Name">GameServer</string>
+        <ProtectedString name="Source">local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Config = require(ReplicatedStorage:WaitForChild("GameConfig"))
+local PlayerDataStore = require(script.Parent:WaitForChild("PlayerDataStore"))
+local SpinService = require(script.Parent:WaitForChild("SpinService"))
+local remotes = ReplicatedStorage:WaitForChild("NumberRushRemotes")
+local spinRequest = remotes:WaitForChild("SpinRequest")
+local spinResult = remotes:WaitForChild("SpinResult")
+local sessions, loading = {}, {}
+local shuttingDown = false
+
+local function send(player, packet)
+	if player.Parent == Players then spinResult:FireClient(player, packet) end
+end
+
+local function publishInventory(player, session)
+	local folder = player:FindFirstChild("NumberInventory")
+	if not folder then folder = Instance.new("Folder"); folder.Name = "NumberInventory"; folder.Parent = player end
+	folder:ClearAllChildren()
+	local count = 0
+	for issuanceId, item in pairs(session.Data.Inventory) do
+		local entry = Instance.new("Folder")
+		entry.Name = tostring(issuanceId)
+		for key, value in pairs(item) do
+			local valueType = type(value)
+			if valueType == "string" or valueType == "number" or valueType == "boolean" then entry:SetAttribute(key, value) end
+		end
+		entry.Parent = folder
+		count += 1
+	end
+	player:SetAttribute("InventoryCount", count)
+	player:SetAttribute("NextSpinSequence", session.Data.NextSpinSequence or 1)
+end
+
+local function closeProfile(player)
+	local session = sessions[player]
+	if not session or session.Closing then return end
+	session.Closing = true
+	player:SetAttribute("DataReady", false)
+	if session.BalanceConnection then session.BalanceConnection:Disconnect() end
+	local deadline = os.clock() + 20
+	while session.Busy and os.clock() &lt; deadline do task.wait(0.1) end
+	local saved, saveError = false, "Не удалось завершить сохранение"
+	for attempt = 1, 3 do
+		if os.clock() &gt;= deadline then break end
+		if not session.Busy then
+			saved, saveError = PlayerDataStore.Save(session, true)
+			if saved then break end
+		end
+		task.wait(1)
+	end
+	if saved then
+		print("NUMBER RUSH: профиль сохранён — " .. player.Name)
+	else
+		warn("NUMBER RUSH: ошибка сохранения — " .. player.Name .. ": " .. tostring(saveError))
+	end
+	sessions[player] = nil
+end
+
+local function stopSession(player, message)
+	player:SetAttribute("DataReady", false)
+	task.spawn(closeProfile, player)
+	if player.Parent == Players then player:Kick(message) end
+end
+
+local function setupPlayer(player)
+	if sessions[player] or loading[player] or shuttingDown then return end
+	loading[player] = true
+	player:SetAttribute("DataReady", false)
+	local session, loadError = nil, nil
+	for attempt = 1, 3 do
+		if player.Parent ~= Players or shuttingDown then break end
+		session, loadError = PlayerDataStore.Load(player.UserId)
+		if session then break end
+		if attempt &lt; 3 then task.wait(2) end
+	end
+	loading[player] = nil
+	if not session then
+		if player.Parent == Players and not shuttingDown then
+			warn("NUMBER RUSH: ошибка загрузки: " .. tostring(loadError))
+			player:Kick("Профиль недоступен. Подключитесь немного позже.")
+		end
+		return
+	end
+	sessions[player] = session
+	session.NextSaveAt = os.clock() + 30
+	if player.Parent ~= Players or shuttingDown then closeProfile(player); return end
+	if session.Data.NextSpinSequence == nil then session.Data.NextSpinSequence = 1 end
+	local recovered, recoveryError, recoveryDetails = SpinService.Recover(session)
+	if not recovered then
+		warn("NUMBER RUSH: восстановление выдачи: " .. tostring(recoveryDetails or recoveryError))
+		stopSession(player, "Не удалось восстановить профиль. Подключитесь немного позже.")
+		return
+	end
+	if player.Parent ~= Players or shuttingDown then closeProfile(player); return end
+	local leaderstats = Instance.new("Folder")
+	leaderstats.Name = "leaderstats"
+	local rubles = Instance.new("IntValue")
+	rubles.Name = "Рубли"
+	rubles.Value = session.Data.Balance
+	rubles.Parent = leaderstats
+	session.BalanceValue = rubles
+	player:SetAttribute("InventoryCapacity", session.Data.InventoryCapacity)
+	player:SetAttribute("IncomeSlotCount", session.Data.IncomeSlotCount)
+	session.BalanceConnection = rubles:GetPropertyChangedSignal("Value"):Connect(function()
+		if session.Closing or session.Closed then return end
+		local value = rubles.Value
+		if value &lt; 0 or value &gt; 1000000000000 then
+			rubles.Value = session.Data.Balance
+			warn("NUMBER RUSH: отклонён некорректный баланс")
+			return
+		end
+		session.Data.Balance = value
+	end)
+	publishInventory(player, session)
+	leaderstats.Parent = player
+	player:SetAttribute("DataReady", true)
+	print("NUMBER RUSH: профиль загружен. Баланс: " .. tostring(session.Data.Balance))
+end
+
+local messages = {
+	InvalidCode = "Выберите доступный код.",
+	InvalidSequence = "Обновите выбор и повторите попытку.",
+	StaleRequest = "Состояние терминала обновилось. Повторите попытку.",
+	Busy = "Прокрутка уже выполняется.", SessionUnavailable = "Профиль временно недоступен.",
+	NotEnoughMoney = "Недостаточно рублей.", InventoryFull = "В коллекции нет свободных мест.",
+	GenerationFailed = "Не удалось подготовить номер. Повторите попытку.",
+	RecoveryRequired = "Для проверки выдачи нужно переподключиться.",
+}
+
+local function sendError(player, session, sequence, code)
+	send(player, {
+		Status = "Error", ErrorCode = code, Sequence = sequence,
+		Message = messages[code] or "Не удалось выполнить прокрутку.",
+		NextSequence = session and (session.Data.NextSpinSequence or 1) or nil,
+		Ready = player:GetAttribute("DataReady") == true,
+	})
+end
+
+spinRequest.OnServerEvent:Connect(function(player, code, sequence)
+	local session = sessions[player]
+	if not session or player:GetAttribute("DataReady") ~= true then sendError(player, session, nil, "SessionUnavailable"); return end
+	local now = os.clock()
+	if session.LastRequestAt and now - session.LastRequestAt &lt; 0.25 then return end
+	session.LastRequestAt = now
+	if session.RequestBusy or session.SpinBusy then sendError(player, session, nil, "Busy"); return end
+	if type(code) ~= "string" or not Config.CodeOffers[code] then sendError(player, session, nil, "InvalidCode"); return end
+	if type(sequence) ~= "number" or sequence % 1 ~= 0 or sequence &lt; 1 or sequence &gt; 1000000000 then sendError(player, session, nil, "InvalidSequence"); return end
+	local lastSpin = session.Data.LastSpin
+	local repeated = lastSpin and lastSpin.Sequence == sequence
+	if not repeated then
+		if sequence ~= (session.Data.NextSpinSequence or 1) then sendError(player, session, sequence, "StaleRequest"); return end
+		local offer = Config.CodeOffers[code]
+		local profile = Config.Profiles[offer.ProfileId]
+		if session.Data.Balance &lt; profile.Price then sendError(player, session, sequence, "NotEnoughMoney"); return end
+		local count = 0
+		for _ in pairs(session.Data.Inventory) do count += 1 end
+		if count &gt;= session.Data.InventoryCapacity then sendError(player, session, sequence, "InventoryFull"); return end
+	end
+	session.RequestBusy = true
+	if not repeated then send(player, {Status = "Started", Sequence = sequence, Code = code, Duration = Config.SpinDuration}) end
+	local receipt, errorCode, details = SpinService.Start(session, code, sequence)
+	session.RequestBusy = false
+	if not receipt then
+		warn("NUMBER RUSH: прокрутка: " .. tostring(errorCode) .. " " .. tostring(details or ""))
+		if errorCode == "RecoveryRequired" then
+			player:SetAttribute("DataReady", false)
+			sendError(player, session, sequence, errorCode)
+			stopSession(player, "Профиль временно недоступен. Переподключитесь для проверки выдачи.")
+		else
+			sendError(player, session, sequence, errorCode)
+		end
+		return
+	end
+	if session.Closing or session.Closed or player.Parent ~= Players then return end
+	publishInventory(player, session)
+	receipt.Balance = session.Data.Balance
+	receipt.NextSequence = session.Data.NextSpinSequence or 1
+	receipt.InventoryCount = player:GetAttribute("InventoryCount")
+	send(player, receipt)
+end)
+
+Players.PlayerRemoving:Connect(closeProfile)
+Players.PlayerAdded:Connect(setupPlayer)
+for _, player in Players:GetPlayers() do task.spawn(setupPlayer, player) end
+
+task.spawn(function()
+	while not shuttingDown do
+		task.wait(5)
+		for player, session in pairs(sessions) do
+			if session.Closing or session.Closed then continue end
+			if os.time() &gt;= session.LeaseUntil - 15 then
+				stopSession(player, "Связь с хранилищем потеряна. Подключитесь немного позже.")
+				continue
+			end
+			if session.SpinBusy or session.RequestBusy then continue end
+			if os.clock() &gt;= session.NextSaveAt and not session.Busy then
+				session.NextSaveAt = os.clock() + 30
+				task.spawn(function()
+					if session.Closing or session.Closed or session.SpinBusy or session.RequestBusy then return end
+					local saved, saveError = PlayerDataStore.Save(session, false)
+					if not saved then warn("NUMBER RUSH: ошибка автосохранения: " .. tostring(saveError)) end
+				end)
+			end
+		end
+	end
+end)
+
+game:BindToClose(function()
+	shuttingDown = true
+	for player in pairs(sessions) do task.spawn(closeProfile, player) end
+	local deadline = os.clock() + 25
+	while os.clock() &lt; deadline do
+		if next(sessions) == nil and next(loading) == nil then break end
+		task.wait(0.1)
+	end
+end)
+</ProtectedString>
+      </Properties>
+    </Item>
+    <Item class="ModuleScript" referent="RBX00000014">
+      <Properties>
+        <string name="Name">NumberEconomy</string>
+        <ProtectedString name="Source">local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Config = require(ReplicatedStorage:WaitForChild("GameConfig"))
+local NumberRules = require(script.Parent:WaitForChild("NumberRules"))
+local NumberEconomy = {}
+
+function NumberEconomy.Evaluate(digits, code, profileId)
+	assert(type(code) == "string" and code:match("^9%d%d$"), "Код должен быть строкой из трёх цифр, начиная с 9")
+	local profile = Config.Profiles[profileId]
+	assert(profile, "Неизвестный профиль прокрутки")
+	local rarityIndex = NumberRules.GetRarity(digits)
+	local rarity = Config.Rarities[rarityIndex]
+	local digitTotal = 0
+	for i = 1, 7 do digitTotal += Config.DigitValues[digits:sub(i, i)] end
+	local hasCodeMatch = digits:sub(1, 3) == code or digits:sub(5, 7) == code
+	local matchPoints = 100
+	if hasCodeMatch then matchPoints += Config.CodeMatchPercent end
+	local prestigePoints = math.floor(profile.Prestige * 100 + 0.5)
+	local numerator = rarity.BasePrice * digitTotal * prestigePoints * matchPoints
+	local denominator = 7 * 100 * 100 * 100
+	local salePrice = math.floor((numerator + denominator / 2) / denominator)
+	return {
+		FullNumber = "7" .. code .. digits,
+		DisplayNumber = string.format("+7 (%s) %s-%s-%s", code, digits:sub(1, 3), digits:sub(4, 5), digits:sub(6, 7)),
+		RarityIndex = rarityIndex, RarityName = rarity.Name,
+		BasePrice = rarity.BasePrice, SalePrice = salePrice, IncomePerHour = rarity.IncomePerHour,
+		DigitMultiplier = digitTotal / 700, PrestigeMultiplier = prestigePoints / 100,
+		CodeMatchMultiplier = matchPoints / 100, HasCodeMatch = hasCodeMatch,
+	}
+end
+
+return NumberEconomy
+</ProtectedString>
+      </Properties>
+    </Item>
+    <Item class="ModuleScript" referent="RBX00000015">
+      <Properties>
+        <string name="Name">NumberGenerator</string>
+        <ProtectedString name="Source">local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Config = require(ReplicatedStorage:WaitForChild("GameConfig"))
+local NumberRules = require(script.Parent:WaitForChild("NumberRules"))
+local NumberGenerator = {}
+local random = Random.new()
+local legendaryNumbers = nil
+
+local function getLegendaryNumbers()
+	if legendaryNumbers then return legendaryNumbers end
+	local list, seen = {}, {}
+	local function add(number)
+		if not seen[number] and NumberRules.GetRarity(number) == 5 then
+			seen[number] = true
+			table.insert(list, number)
+		end
+	end
+	for digit = 0, 9 do
+		local repeated = string.rep(tostring(digit), 6)
+		for other = 0, 9 do
+			add(repeated .. tostring(other))
+			add(tostring(other) .. repeated)
+		end
+	end
+	for first = 0, 9 do
+		for second = 0, 9 do
+			if first ~= second then
+				local a, b = tostring(first), tostring(second)
+				add(a .. b .. a .. b .. a .. b .. a)
+			end
+		end
+	end
+	for start = 0, 3 do
+		local ascending, descending = "", ""
+		for offset = 0, 6 do
+			ascending ..= tostring(start + offset)
+			descending ..= tostring(start + 6 - offset)
+		end
+		add(ascending)
+		add(descending)
+	end
+	assert(#list == 278, "Ошибка: ожидалось 278 легендарных комбинаций")
+	legendaryNumbers = list
+	return list
+end
+
+function NumberGenerator.RollRarity(profileId)
+	local profile = Config.Profiles[profileId]
+	assert(profile, "Неизвестный профиль прокрутки")
+	local totalWeight = 0
+	for _, weight in profile.Weights do
+		assert(type(weight) == "number" and weight &gt;= 0 and weight % 1 == 0, "Вес категории должен быть целым неотрицательным числом")
+		totalWeight += weight
+	end
+	assert(totalWeight == 10000000, "Сумма весов профиля должна быть 10 миллионов")
+	local roll = random:NextInteger(1, totalWeight)
+	local accumulated = 0
+	for rarityIndex, weight in profile.Weights do
+		accumulated += weight
+		if roll &lt;= accumulated then return rarityIndex end
+	end
+	error("Не удалось выбрать категорию")
+end
+
+function NumberGenerator.GenerateDigits(rarityIndex)
+	assert(type(rarityIndex) == "number" and rarityIndex % 1 == 0 and rarityIndex &gt;= 1 and rarityIndex &lt;= #Config.Rarities, "Некорректный индекс категории")
+	if rarityIndex == 6 then return string.rep(tostring(random:NextInteger(0, 9)), 7) end
+	if rarityIndex == 5 then
+		local list = getLegendaryNumbers()
+		return list[random:NextInteger(1, #list)]
+	end
+	for attempt = 1, 10000 do
+		local number = string.format("%07d", random:NextInteger(0, 9999999))
+		if NumberRules.GetRarity(number) == rarityIndex then return number end
+		if attempt % 250 == 0 then task.wait() end
+	end
+	return nil, "Не удалось подобрать комбинацию"
+end
+
+function NumberGenerator.Generate(profileId)
+	local rarityIndex = NumberGenerator.RollRarity(profileId)
+	local digits, generationError = NumberGenerator.GenerateDigits(rarityIndex)
+	if not digits then return nil, generationError end
+	return {Digits = digits, RarityIndex = rarityIndex, RarityName = Config.Rarities[rarityIndex].Name, ProfileId = profileId}
+end
+
+return NumberGenerator
+</ProtectedString>
+      </Properties>
+    </Item>
+    <Item class="ModuleScript" referent="RBX00000016">
+      <Properties>
+        <string name="Name">NumberRegistry</string>
+        <ProtectedString name="Source">local DataStoreService = game:GetService("DataStoreService")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local storeName = "NR_Numbers_LIVE_v1"
+if RunService:IsStudio() then storeName = "NR_Numbers_DEV_v1" end
+local store = DataStoreService:GetDataStore(storeName)
+local NumberRegistry = {}
+
+local function validateArguments(fullNumber, userId, operationId)
+	assert(type(fullNumber) == "string" and #fullNumber == 11 and fullNumber:match("^79%d+$"), "Некорректный полный номер")
+	assert(type(userId) == "number" and userId % 1 == 0, "Некорректный UserId")
+	assert(type(operationId) == "string" and #operationId &gt; 0 and #operationId &lt;= 64, "Некорректный идентификатор операции")
+end
+
+local function validRecord(record)
+	if type(record) ~= "table" or record.SchemaVersion ~= 1 or type(record.Generation) ~= "number" or record.Generation &lt; 1 or record.Generation % 1 ~= 0 then return false end
+	if record.State == "Free" then return true end
+	if record.State ~= "Reserved" and record.State ~= "Owned" then return false end
+	return type(record.OwnerId) == "number" and type(record.OperationId) == "string" and type(record.IssuanceId) == "string"
+end
+
+local function updateRecord(fullNumber, transform)
+	local rejectionReason = "Rejected"
+	local success, result = pcall(function()
+		return store:UpdateAsync(fullNumber, function(oldRecord)
+			if oldRecord ~= nil and not validRecord(oldRecord) then rejectionReason = "InvalidRecord"; return nil end
+			local updated, reason = transform(oldRecord)
+			if updated == nil then rejectionReason = reason or "Rejected" end
+			return updated
+		end)
+	end)
+	if not success then return nil, "StorageError", tostring(result) end
+	if result == nil then return nil, rejectionReason end
+	return result
+end
+
+function NumberRegistry.Reserve(fullNumber, userId, operationId)
+	validateArguments(fullNumber, userId, operationId)
+	local issuanceId = HttpService:GenerateGUID(false)
+	return updateRecord(fullNumber, function(oldRecord)
+		if oldRecord and oldRecord.State ~= "Free" then
+			if oldRecord.OwnerId == userId and oldRecord.OperationId == operationId then return oldRecord end
+			return nil, "Occupied"
+		end
+		local generation = 1
+		if oldRecord then generation = oldRecord.Generation + 1 end
+		return {SchemaVersion = 1, State = "Reserved", OwnerId = userId, OperationId = operationId, IssuanceId = issuanceId, Generation = generation, UpdatedAt = os.time()}
+	end)
+end
+
+function NumberRegistry.Confirm(fullNumber, userId, operationId)
+	validateArguments(fullNumber, userId, operationId)
+	return updateRecord(fullNumber, function(record)
+		if not record or record.State == "Free" then return nil, "NotReserved" end
+		if record.OwnerId ~= userId or record.OperationId ~= operationId then return nil, "OwnerMismatch" end
+		if record.State == "Owned" then return record end
+		record.State = "Owned"
+		record.UpdatedAt = os.time()
+		return record
+	end)
+end
+
+function NumberRegistry.Cancel(fullNumber, userId, operationId)
+	validateArguments(fullNumber, userId, operationId)
+	return updateRecord(fullNumber, function(record)
+		if not record then return nil, "NotReserved" end
+		if record.State == "Free" and record.OperationId == operationId and record.LastOwnerId == userId then return record end
+		if record.OwnerId ~= userId or record.OperationId ~= operationId then return nil, "OwnerMismatch" end
+		if record.State == "Owned" then return nil, "AlreadyOwned" end
+		if record.State ~= "Reserved" then return nil, "NotReserved" end
+		record.State = "Free"
+		record.LastOwnerId = userId
+		record.OwnerId = nil
+		record.UpdatedAt = os.time()
+		return record
+	end)
+end
+
+return NumberRegistry
+</ProtectedString>
+      </Properties>
+    </Item>
+    <Item class="ModuleScript" referent="RBX00000017">
+      <Properties>
+        <string name="Name">NumberRules</string>
+        <ProtectedString name="Source">local NumberRules = {}
+
+function NumberRules.GetRarity(number)
+	assert(type(number) == "string" and number:match("^%d%d%d%d%d%d%d$"), "Номер должен быть строкой из семи цифр")
+	local digits = {}
+	for i = 1, 7 do
+		digits[i] = tonumber(number:sub(i, i))
+	end
+	local run, longestRun = 1, 1
+	local ascending, descending, longestSequence = 1, 1, 1
+	for i = 2, 7 do
+		if digits[i] == digits[i - 1] then run += 1 else run = 1 end
+		longestRun = math.max(longestRun, run)
+		local difference = digits[i] - digits[i - 1]
+		if difference == 1 then ascending += 1 else ascending = 1 end
+		if difference == -1 then descending += 1 else descending = 1 end
+		longestSequence = math.max(longestSequence, ascending, descending)
+	end
+	if longestRun == 7 then return 6 end
+	local alternating = digits[1] ~= digits[2] and number:sub(1, 5) == number:sub(3, 7)
+	if longestRun &gt;= 6 or longestSequence == 7 or alternating then return 5 end
+	local fullMirror = number == number:reverse()
+	local repeatedBlock = number:sub(2, 4) == number:sub(5, 7)
+		and not (digits[2] == digits[3] and digits[3] == digits[4])
+	if fullMirror or longestRun &gt;= 5 or repeatedBlock then return 4 end
+	local threePairs = digits[2] == digits[3] and digits[4] == digits[5]
+		and digits[6] == digits[7] and digits[2] ~= digits[4]
+		and digits[2] ~= digits[6] and digits[4] ~= digits[6]
+	local alternatingEnding = digits[4] == digits[6] and digits[5] == digits[7] and digits[4] ~= digits[5]
+	if longestRun &gt;= 4 or longestSequence &gt;= 5 or threePairs or alternatingEnding then return 3 end
+	local ending = number:sub(4, 7)
+	if longestRun &gt;= 2 or longestSequence &gt;= 3 or ending == ending:reverse() then return 2 end
+	return 1
+end
+
+return NumberRules
+</ProtectedString>
+      </Properties>
+    </Item>
+    <Item class="ModuleScript" referent="RBX00000018">
+      <Properties>
+        <string name="Name">PlayerDataStore</string>
+        <ProtectedString name="Source">local DataStoreService = game:GetService("DataStoreService")
+local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Config = require(ReplicatedStorage:WaitForChild("GameConfig"))
+local storeName = "NR_Profiles_LIVE_v1"
+if RunService:IsStudio() then storeName = "NR_Profiles_DEV_v1" end
+local store = DataStoreService:GetDataStore(storeName)
+local PlayerDataStore = {}
+PlayerDataStore.LeaseSeconds = 120
+
+local function createDefaultData()
+	return {
+		Balance = Config.StartingBalance, Inventory = {}, IncomeSlots = {},
+		InventoryCapacity = Config.StartingInventoryCapacity,
+		IncomeSlotCount = Config.StartingIncomeSlots,
+	}
+end
+
+local function validData(data)
+	return type(data) == "table" and type(data.Balance) == "number"
+		and data.Balance &gt;= 0 and data.Balance &lt;= 1000000000000 and data.Balance % 1 == 0
+		and type(data.Inventory) == "table" and type(data.IncomeSlots) == "table"
+		and type(data.InventoryCapacity) == "number" and type(data.IncomeSlotCount) == "number"
+end
+
+local function copyTable(source)
+	local copy = {}
+	for key, value in pairs(source) do
+		if type(value) == "table" then copy[key] = copyTable(value) else copy[key] = value end
+	end
+	return copy
+end
+
+function PlayerDataStore.Load(userId)
+	local key = "Player_" .. tostring(userId)
+	local token = HttpService:GenerateGUID(false)
+	local failureReason = "Профиль недоступен"
+	local success, record = pcall(function()
+		return store:UpdateAsync(key, function(oldRecord)
+			local now = os.time()
+			if oldRecord == nil then
+				oldRecord = {SchemaVersion = 1, Data = createDefaultData()}
+			end
+			if type(oldRecord) ~= "table" or oldRecord.SchemaVersion ~= 1 or not validData(oldRecord.Data) then
+				failureReason = "Неизвестный или повреждённый профиль"
+				return nil
+			end
+			local lock = oldRecord.Session
+			if lock ~= nil then
+				if type(lock) ~= "table" or type(lock.Id) ~= "string" or type(lock.ExpiresAt) ~= "number" then
+					failureReason = "Некорректная блокировка профиля"
+					return nil
+				end
+				if lock.Id ~= token and lock.ExpiresAt &gt; now then
+					failureReason = "Профиль ещё открыт другим сервером"
+					return nil
+				end
+			end
+			oldRecord.Session = {Id = token, ExpiresAt = now + PlayerDataStore.LeaseSeconds}
+			oldRecord.UpdatedAt = now
+			return oldRecord
+		end)
+	end)
+	if not success then return nil, tostring(record) end
+	if type(record) ~= "table" or type(record.Session) ~= "table" or record.Session.Id ~= token then return nil, failureReason end
+	return {UserId = userId, Key = key, Token = token, Data = copyTable(record.Data), LeaseUntil = record.Session.ExpiresAt, Busy = false, Closed = false}
+end
+
+function PlayerDataStore.Save(session, release)
+	if session.Closed then return true end
+	if session.Busy then return false, "Сохранение уже выполняется" end
+	if not validData(session.Data) then return false, "Некорректные данные для сохранения" end
+	local snapshot = copyTable(session.Data)
+	session.Busy = true
+	local failureReason = "Блокировка профиля потеряна"
+	local success, record = pcall(function()
+		return store:UpdateAsync(session.Key, function(oldRecord)
+			local now = os.time()
+			if type(oldRecord) ~= "table" or oldRecord.SchemaVersion ~= 1 or type(oldRecord.Session) ~= "table" then return nil end
+			local lock = oldRecord.Session
+			if lock.Id ~= session.Token or type(lock.ExpiresAt) ~= "number" or lock.ExpiresAt &lt;= now then return nil end
+			oldRecord.Data = snapshot
+			oldRecord.UpdatedAt = now
+			if release then
+				oldRecord.Session = nil
+			else
+				oldRecord.Session = {Id = session.Token, ExpiresAt = now + PlayerDataStore.LeaseSeconds}
+			end
+			return oldRecord
+		end)
+	end)
+	session.Busy = false
+	if not success then return false, tostring(record) end
+	if type(record) ~= "table" then return false, failureReason end
+	if release then session.Closed = true; session.LeaseUntil = 0 else session.LeaseUntil = record.Session.ExpiresAt end
+	return true
+end
+
+return PlayerDataStore
+</ProtectedString>
+      </Properties>
+    </Item>
+    <Item class="ModuleScript" referent="RBX00000019">
+      <Properties>
+        <string name="Name">SpinService</string>
+        <ProtectedString name="Source">local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Config = require(ReplicatedStorage:WaitForChild("GameConfig"))
+local PlayerDataStore = require(script.Parent:WaitForChild("PlayerDataStore"))
+local NumberGenerator = require(script.Parent:WaitForChild("NumberGenerator"))
+local NumberEconomy = require(script.Parent:WaitForChild("NumberEconomy"))
+local NumberRegistry = require(script.Parent:WaitForChild("NumberRegistry"))
+local SpinService = {}
+local MAX_CANDIDATES = 8
+
+local function copyTable(source)
+	local result = {}
+	for key, value in pairs(source) do
+		if type(value) == "table" then result[key] = copyTable(value) else result[key] = value end
+	end
+	return result
+end
+
+local function sessionAvailable(session)
+	return not session.Closed and not session.Closing and os.time() &lt; session.LeaseUntil - 10
+end
+
+local function syncBalance(session)
+	if session.BalanceValue then session.BalanceValue.Value = session.Data.Balance end
+end
+
+local function persist(session)
+	local deadline = os.clock() + 10
+	while session.Busy and os.clock() &lt; deadline do
+		if not sessionAvailable(session) then return false, "Сессия закрывается" end
+		task.wait(0.1)
+	end
+	if not sessionAvailable(session) then return false, "Сессия недоступна" end
+	if session.Busy then return false, "Предыдущее сохранение не завершилось" end
+	return PlayerDataStore.Save(session, false)
+end
+
+local function makeDraft(code, rarityIndex)
+	local offer = Config.CodeOffers[code]
+	if not offer then return nil, "Предложение недоступно" end
+	local digits, generationError = NumberGenerator.GenerateDigits(rarityIndex)
+	if not digits then return nil, generationError end
+	local draft = NumberEconomy.Evaluate(digits, code, offer.ProfileId)
+	draft.Code = code
+	draft.Digits = digits
+	draft.ProfileId = offer.ProfileId
+	draft.OperatorId = offer.OperatorId
+	draft.OperatorName = offer.OperatorName
+	draft.Region = offer.Region
+	return draft
+end
+
+local function refundPending(session, reason)
+	if not sessionAvailable(session) then return nil, "RecoveryRequired", "Сессия закрывается" end
+	local data = session.Data
+	local pending = data.PendingSpin
+	data.Balance += pending.Price
+	local receipt = {Status = "Cancelled", Sequence = pending.Sequence, Balance = data.Balance, Reason = reason}
+	data.PendingSpin = nil
+	data.LastSpin = copyTable(receipt)
+	syncBalance(session)
+	local saved, saveError = persist(session)
+	if not saved then return nil, "RecoveryRequired", saveError end
+	return receipt
+end
+
+local function finishPending(session)
+	local data = session.Data
+	local pending = data.PendingSpin
+	if not pending then return {Status = "Ready", Balance = data.Balance} end
+	if type(pending) ~= "table" or type(pending.Draft) ~= "table"
+		or type(pending.OperationId) ~= "string" or type(pending.Sequence) ~= "number"
+		or type(pending.Price) ~= "number" or type(pending.Attempt) ~= "number"
+		or type(pending.NotBeforeMillis) ~= "number"
+	then
+		return nil, "RecoveryRequired", "Некорректная запись выдачи"
+	end
+	while DateTime.now().UnixTimestampMillis &lt; pending.NotBeforeMillis do
+		if not sessionAvailable(session) then return nil, "RecoveryRequired", "Сессия закрывается" end
+		task.wait(0.1)
+	end
+	while sessionAvailable(session) do
+		local draft = pending.Draft
+		local reservation, reserveError, reserveDetails = NumberRegistry.Reserve(draft.FullNumber, session.UserId, pending.OperationId)
+		if not reservation then
+			if reserveError ~= "Occupied" then return nil, "RecoveryRequired", reserveDetails or reserveError end
+			if pending.Attempt &gt;= MAX_CANDIDATES then
+				return refundPending(session, "Не найден свободный номер выбранной категории")
+			end
+			local nextDraft, draftError = makeDraft(draft.Code, draft.RarityIndex)
+			if not nextDraft then return refundPending(session, draftError) end
+			if not sessionAvailable(session) then return nil, "RecoveryRequired", "Сессия закрывается" end
+			pending.Attempt += 1
+			pending.Draft = nextDraft
+			local saved, saveError = persist(session)
+			if not saved then return nil, "RecoveryRequired", saveError end
+			continue
+		end
+		local owned, confirmError, confirmDetails = NumberRegistry.Confirm(draft.FullNumber, session.UserId, pending.OperationId)
+		if not owned then return nil, "RecoveryRequired", confirmDetails or confirmError end
+		if not sessionAvailable(session) then return nil, "RecoveryRequired", "Сессия закрывается" end
+		local item = copyTable(draft)
+		item.IssuanceId = owned.IssuanceId
+		item.Generation = owned.Generation
+		item.OperationId = pending.OperationId
+		item.OriginalOwnerId = session.UserId
+		item.CanBoostSale = true
+		item.Location = "Inventory"
+		item.AcquiredAt = os.time()
+		local existing = data.Inventory[item.IssuanceId]
+		if existing and existing.OperationId ~= pending.OperationId then return nil, "RecoveryRequired", "Конфликт записи предмета" end
+		data.Inventory[item.IssuanceId] = existing or item
+		local receipt = {Status = "Success", Sequence = pending.Sequence, Balance = data.Balance, Item = copyTable(data.Inventory[item.IssuanceId])}
+		data.LastSpin = copyTable(receipt)
+		data.PendingSpin = nil
+		local saved, saveError = persist(session)
+		if not saved then return nil, "RecoveryRequired", saveError end
+		syncBalance(session)
+		return receipt
+	end
+	return nil, "RecoveryRequired", "Сессия недоступна"
+end
+
+local function runExclusive(session, callback)
+	if session.SpinBusy then return nil, "Busy" end
+	if session.NeedsRecovery then return nil, "RecoveryRequired" end
+	if not sessionAvailable(session) then return nil, "SessionUnavailable" end
+	session.SpinBusy = true
+	local success, result, errorCode, details = pcall(callback)
+	session.SpinBusy = false
+	if not success then session.NeedsRecovery = true; return nil, "RecoveryRequired", tostring(result) end
+	if errorCode == "RecoveryRequired" then session.NeedsRecovery = true end
+	return result, errorCode, details
+end
+
+function SpinService.Recover(session)
+	return runExclusive(session, function() return finishPending(session) end)
+end
+
+function SpinService.Start(session, code, sequence)
+	return runExclusive(session, function()
+		local data = session.Data
+		if type(code) ~= "string" or not Config.CodeOffers[code] then return nil, "InvalidCode" end
+		if type(sequence) ~= "number" or sequence % 1 ~= 0 or sequence &lt; 1 or sequence &gt; 1000000000 then return nil, "InvalidSequence" end
+		if data.LastSpin and data.LastSpin.Sequence == sequence then return copyTable(data.LastSpin) end
+		if data.PendingSpin then
+			if data.PendingSpin.Sequence == sequence then return finishPending(session) end
+			return nil, "Busy"
+		end
+		local nextSequence = data.NextSpinSequence or 1
+		if sequence ~= nextSequence then return nil, "StaleRequest" end
+		local offer = Config.CodeOffers[code]
+		local profile = Config.Profiles[offer.ProfileId]
+		if data.Balance &lt; profile.Price then return nil, "NotEnoughMoney" end
+		local count = 0
+		for _ in pairs(data.Inventory) do count += 1 end
+		if count &gt;= data.InventoryCapacity then return nil, "InventoryFull" end
+		local startedAt = DateTime.now().UnixTimestampMillis
+		local rarityIndex = NumberGenerator.RollRarity(offer.ProfileId)
+		local draft, draftError = makeDraft(code, rarityIndex)
+		if not draft then return nil, "GenerationFailed", draftError end
+		if not sessionAvailable(session) then return nil, "SessionUnavailable" end
+		local pending = {
+			OperationId = HttpService:GenerateGUID(false), Sequence = sequence,
+			Price = profile.Price, Attempt = 1, Draft = draft,
+			NotBeforeMillis = startedAt + Config.SpinDuration * 1000,
+		}
+		data.PendingSpin = pending
+		data.NextSpinSequence = sequence + 1
+		data.Balance -= profile.Price
+		syncBalance(session)
+		local saved, saveError = persist(session)
+		if not saved then return nil, "RecoveryRequired", saveError end
+		return finishPending(session)
+	end)
+end
+
+return SpinService
+</ProtectedString>
+      </Properties>
+    </Item>
+  </Item>
+  <Item class="StarterGui" referent="RBX00000006">
+    <Properties>
+      <string name="Name">StarterGui</string>
+    </Properties>
+  </Item>
+  <Item class="StarterPlayer" referent="RBX00000007">
+    <Properties>
+      <string name="Name">StarterPlayer</string>
+    </Properties>
+    <Item class="StarterPlayerScripts" referent="RBX00000008">
+      <Properties>
+        <string name="Name">StarterPlayerScripts</string>
+      </Properties>
+      <Item class="LocalScript" referent="RBX00000020">
+        <Properties>
+          <string name="Name">NumberRushUI</string>
+          <ProtectedString name="Source">local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local Config = require(ReplicatedStorage:WaitForChild("GameConfig"))
+local oldGui = playerGui:FindFirstChild("NumberRushUI")
+if oldGui then oldGui:Destroy() end
+
+local function formatMoney(value)
+	local text = string.format("%.0f", value)
+	local formatted = text:reverse():gsub("(%d%d%d)", "%1 ")
+	return formatted:reverse():gsub("^ ", "")
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "NumberRushUI"
+gui.ResetOnSpawn = false
+gui.Parent = playerGui
+
+local window = Instance.new("Frame")
+window.Name = "Window"
+window.AnchorPoint = Vector2.new(0.5, 0.5)
+window.Position = UDim2.fromScale(0.5, 0.5)
+window.Size = UDim2.fromOffset(620, 420)
+window.BackgroundColor3 = Color3.fromRGB(236, 233, 216)
+window.BorderSizePixel = 3
+window.BorderColor3 = Color3.fromRGB(0, 60, 170)
+window.Parent = gui
+
+local titleBar = Instance.new("Frame")
+titleBar.Name = "TitleBar"
+titleBar.Size = UDim2.new(1, 0, 0, 34)
+titleBar.BackgroundColor3 = Color3.fromRGB(0, 84, 227)
+titleBar.BorderSizePixel = 0
+titleBar.Parent = window
+local titleGradient = Instance.new("UIGradient")
+titleGradient.Color = ColorSequence.new(Color3.fromRGB(55, 130, 245), Color3.fromRGB(0, 55, 170))
+titleGradient.Rotation = 90
+titleGradient.Parent = titleBar
+
+local function makeLabel(name, text, position, size)
+	local label = Instance.new("TextLabel")
+	label.Name = name
+	label.Text = text
+	label.Position = position
+	label.Size = size
+	label.BackgroundTransparency = 1
+	label.Font = Enum.Font.Arial
+	label.TextSize = 18
+	label.TextColor3 = Color3.fromRGB(25, 25, 25)
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = window
+	return label
+end
+
+local titleLabel = makeLabel("Title", "NUMBER RUSH — Терминал оператора", UDim2.fromOffset(12, 0), UDim2.new(1, -24, 0, 34))
+titleLabel.Font = Enum.Font.ArialBold
+titleLabel.TextColor3 = Color3.new(1, 1, 1)
+local balanceLabel = makeLabel("Balance", "Баланс: загрузка...", UDim2.fromOffset(24, 52), UDim2.new(1, -48, 0, 30))
+balanceLabel.Font = Enum.Font.ArialBold
+balanceLabel.TextSize = 22
+local profileLabel = makeLabel("Profile", "Стартовая прокрутка", UDim2.fromOffset(24, 96), UDim2.new(1, -48, 0, 28))
+
+local resultPanel = Instance.new("Frame")
+resultPanel.Name = "ResultPanel"
+resultPanel.Position = UDim2.fromOffset(24, 140)
+resultPanel.Size = UDim2.new(1, -48, 0, 130)
+resultPanel.BackgroundColor3 = Color3.fromRGB(255, 255, 250)
+resultPanel.BorderColor3 = Color3.fromRGB(150, 150, 140)
+resultPanel.BorderSizePixel = 1
+resultPanel.Parent = window
+local resultLabel = Instance.new("TextLabel")
+resultLabel.Name = "Number"
+resultLabel.Size = UDim2.new(1, -24, 0, 60)
+resultLabel.Position = UDim2.fromOffset(12, 12)
+resultLabel.BackgroundTransparency = 1
+resultLabel.Font = Enum.Font.ArialBold
+resultLabel.TextSize = 30
+resultLabel.Text = "+7 (---) --- -- --"
+resultLabel.TextColor3 = Color3.fromRGB(30, 45, 70)
+resultLabel.Parent = resultPanel
+local detailsLabel = Instance.new("TextLabel")
+detailsLabel.Name = "Details"
+detailsLabel.Position = UDim2.fromOffset(12, 78)
+detailsLabel.Size = UDim2.new(1, -24, 0, 36)
+detailsLabel.BackgroundTransparency = 1
+detailsLabel.Font = Enum.Font.Arial
+detailsLabel.TextSize = 16
+detailsLabel.Text = "Здесь появится полученный номер"
+detailsLabel.TextColor3 = Color3.fromRGB(90, 90, 90)
+detailsLabel.Parent = resultPanel
+
+local spinButton = Instance.new("TextButton")
+spinButton.Name = "SpinButton"
+spinButton.Position = UDim2.fromOffset(24, 294)
+spinButton.Size = UDim2.new(1, -48, 0, 52)
+spinButton.BackgroundColor3 = Color3.fromRGB(215, 215, 205)
+spinButton.BorderColor3 = Color3.fromRGB(130, 130, 120)
+spinButton.Font = Enum.Font.ArialBold
+spinButton.TextSize = 22
+spinButton.TextColor3 = Color3.fromRGB(100, 100, 100)
+spinButton.Text = "Крутить — " .. formatMoney(Config.Profiles.Starter.Price) .. " ₽"
+spinButton.AutoButtonColor = false
+spinButton.Active = false
+spinButton.Parent = window
+local statusLabel = makeLabel("Status", "Продолжительность: " .. Config.SpinDuration .. " секунд", UDim2.fromOffset(24, 364), UDim2.new(1, -48, 0, 28))
+statusLabel.TextSize = 16
+
+-- Исправление ожидания данных из шага 19: ограниченные таймауты.
+task.spawn(function()
+	statusLabel.Text = "Загрузка профиля..."
+	local stats = player:WaitForChild("leaderstats", 30)
+	if not stats then
+		balanceLabel.Text = "Баланс недоступен"
+		statusLabel.Text = "Профиль не загрузился. Переподключитесь."
+		warn("NUMBER RUSH UI: leaderstats не появился за 30 секунд")
+		return
+	end
+	local rubles = stats:WaitForChild("Рубли", 10)
+	if not rubles then
+		balanceLabel.Text = "Баланс недоступен"
+		statusLabel.Text = "Не найден показатель рублей."
+		warn("NUMBER RUSH UI: в leaderstats отсутствует Рубли")
+		return
+	end
+	local function updateBalance() balanceLabel.Text = "Баланс: " .. formatMoney(rubles.Value) .. " ₽" end
+	rubles:GetPropertyChangedSignal("Value"):Connect(updateBalance)
+	updateBalance()
+	statusLabel.Text = "Продолжительность: " .. Config.SpinDuration .. " секунд"
+end)
+
+-- Выбор оператора, региона и кода (шаг 20).
+window.Size = UDim2.fromOffset(620, 540)
+profileLabel.Position = UDim2.fromOffset(24, 254)
+resultPanel.Position = UDim2.fromOffset(24, 294)
+resultPanel.Size = UDim2.new(1, -48, 0, 112)
+resultLabel.Position = UDim2.fromOffset(12, 6)
+resultLabel.Size = UDim2.new(1, -24, 0, 50)
+detailsLabel.Position = UDim2.fromOffset(12, 64)
+detailsLabel.Size = UDim2.new(1, -24, 0, 32)
+spinButton.Position = UDim2.fromOffset(24, 424)
+spinButton.Size = UDim2.new(1, -48, 0, 44)
+statusLabel.Position = UDim2.fromOffset(24, 484)
+makeLabel("OperatorTitle", "Оператор", UDim2.fromOffset(24, 94), UDim2.new(1, -48, 0, 22))
+makeLabel("CodeTitle", "Регион и код", UDim2.fromOffset(24, 164), UDim2.new(1, -48, 0, 22))
+
+local function makeChoiceFrame(name, y, height)
+	local frame = Instance.new("Frame")
+	frame.Name = name
+	frame.Position = UDim2.fromOffset(24, y)
+	frame.Size = UDim2.new(1, -48, 0, height)
+	frame.BackgroundTransparency = 1
+	frame.Parent = window
+	return frame
+end
+local operatorFrame = makeChoiceFrame("Operators", 120, 34)
+local codeFrame = makeChoiceFrame("Codes", 190, 52)
+
+local function makeChoiceButton(parent, text, index, count)
+	local button = Instance.new("TextButton")
+	button.Name = "Choice" .. index
+	button.Position = UDim2.new((index - 1) / count, 3, 0, 0)
+	button.Size = UDim2.new(1 / count, -6, 1, 0)
+	button.BackgroundColor3 = Color3.fromRGB(240, 240, 230)
+	button.BorderColor3 = Color3.fromRGB(140, 140, 130)
+	button.Font = Enum.Font.Arial
+	button.TextSize = 16
+	button.TextWrapped = true
+	button.TextColor3 = Color3.fromRGB(30, 30, 30)
+	button.Text = text
+	button.Parent = parent
+	return button
+end
+
+local function highlightButton(button, selected)
+	if selected then
+		button.BackgroundColor3 = Color3.fromRGB(210, 230, 255)
+		button.BorderColor3 = Color3.fromRGB(0, 84, 227)
+	else
+		button.BackgroundColor3 = Color3.fromRGB(240, 240, 230)
+		button.BorderColor3 = Color3.fromRGB(140, 140, 130)
+	end
+end
+
+local operatorButtons, codeButtons = {}, {}
+local selectedOffer = nil
+
+local function selectOffer(offer)
+	selectedOffer = offer
+	local profile = Config.Profiles[offer.ProfileId]
+	local catalogOffer = Config.CodeOffers[offer.Code]
+	window:SetAttribute("SelectedCode", offer.Code)
+	profileLabel.Text = catalogOffer.OperatorName .. " · " .. profile.Name
+	spinButton.Text = "Крутить — " .. formatMoney(profile.Price) .. " ₽"
+	resultLabel.Text = "+7 (" .. offer.Code .. ") --- -- --"
+	local minimumRarity = 1
+	for index, weight in profile.Weights do
+		if weight &gt; 0 then minimumRarity = index; break end
+	end
+	detailsLabel.Text = "Гарантия: " .. Config.Rarities[minimumRarity].Name .. " и выше"
+	for _, entry in codeButtons do highlightButton(entry.Button, entry.Offer.Code == offer.Code) end
+end
+
+local function selectOperator(operatorIndex)
+	local operator = Config.Operators[operatorIndex]
+	local previousRegion = nil
+	if selectedOffer then previousRegion = selectedOffer.Region end
+	for index, button in operatorButtons do highlightButton(button, index == operatorIndex) end
+	for _, entry in codeButtons do entry.Button:Destroy() end
+	table.clear(codeButtons)
+	local preferredOffer = operator.Codes[1]
+	for index, codeOffer in operator.Codes do
+		local offer = codeOffer
+		local button = makeChoiceButton(codeFrame, offer.Region .. "\n+7 (" .. offer.Code .. ")", index, #operator.Codes)
+		table.insert(codeButtons, {Button = button, Offer = offer})
+		button.Activated:Connect(function() selectOffer(offer) end)
+		if offer.Region == previousRegion then preferredOffer = offer end
+	end
+	selectOffer(preferredOffer)
+end
+
+for index, operator in Config.Operators do
+	local operatorIndex = index
+	local button = makeChoiceButton(operatorFrame, operator.Name, index, #Config.Operators)
+	operatorButtons[index] = button
+	button.Activated:Connect(function() selectOperator(operatorIndex) end)
+end
+selectOperator(1)
+
+-- Подключение платной прокрутки (шаг 25).
+-- Не включён предложенный в шаге 21 автоскейл: пользователь отказался от изменения окна.
+local spinRemotes = ReplicatedStorage:WaitForChild("NumberRushRemotes", 15)
+if not spinRemotes then
+	statusLabel.Text = "Терминал недоступен"
+	warn("NUMBER RUSH UI: папка NumberRushRemotes не найдена")
+	return
+end
+local requestRemote = spinRemotes:WaitForChild("SpinRequest", 15)
+local resultRemote = spinRemotes:WaitForChild("SpinResult", 15)
+if not requestRemote or not resultRemote then
+	statusLabel.Text = "Терминал недоступен"
+	warn("NUMBER RUSH UI: отсутствуют события прокрутки")
+	return
+end
+
+local busy = false
+local nextSequence = 0
+local activeSequence = nil
+local animationToken = 0
+local balanceValue = nil
+local visualRandom = Random.new()
+statusLabel.TextWrapped = true
+statusLabel.TextSize = 14
+statusLabel.Size = UDim2.new(1, -48, 0, 42)
+
+local function refreshControls()
+	local serverSequence = player:GetAttribute("NextSpinSequence")
+	if type(serverSequence) == "number" then nextSequence = math.max(nextSequence, serverSequence) end
+	local ready = player:GetAttribute("DataReady") == true
+	local offer = selectedOffer
+	local profile = offer and Config.Profiles[offer.ProfileId] or nil
+	local money = balanceValue and balanceValue.Value or 0
+	local count = player:GetAttribute("InventoryCount") or 0
+	local capacity = player:GetAttribute("InventoryCapacity") or 25
+	local enabled = ready and not busy and profile ~= nil and balanceValue ~= nil
+		and nextSequence &gt;= 1 and money &gt;= profile.Price and count &lt; capacity
+	spinButton.Active = enabled
+	spinButton.Interactable = enabled
+	spinButton.AutoButtonColor = enabled
+	if enabled then
+		spinButton.BackgroundColor3 = Color3.fromRGB(220, 235, 255)
+		spinButton.TextColor3 = Color3.fromRGB(20, 45, 80)
+	else
+		spinButton.BackgroundColor3 = Color3.fromRGB(215, 215, 205)
+		spinButton.TextColor3 = Color3.fromRGB(100, 100, 100)
+	end
+	if busy then spinButton.Text = "Прокрутка..."
+	elseif count &gt;= capacity then spinButton.Text = "Коллекция заполнена"
+	elseif profile then spinButton.Text = "Крутить — " .. formatMoney(profile.Price) .. " ₽" end
+	for _, frame in {operatorFrame, codeFrame} do
+		for _, button in frame:GetChildren() do
+			if button:IsA("TextButton") then button.Active = not busy; button.Interactable = not busy end
+		end
+	end
+end
+
+local function stopAnimation() animationToken += 1 end
+
+local function startAnimation(code, duration)
+	animationToken += 1
+	local token = animationToken
+	local startedAt = os.clock()
+	task.spawn(function()
+		while busy and animationToken == token do
+			resultLabel.Text = string.format("+7 (%s) %03d-%02d-%02d", code, visualRandom:NextInteger(0, 999), visualRandom:NextInteger(0, 99), visualRandom:NextInteger(0, 99))
+			local remaining = math.ceil(math.max(0, duration - (os.clock() - startedAt)))
+			if remaining &gt; 0 then statusLabel.Text = "Получение номера... " .. remaining .. " сек."
+			else statusLabel.Text = "Завершаем выдачу номера..." end
+			task.wait(0.08)
+		end
+	end)
+end
+
+resultRemote.OnClientEvent:Connect(function(packet)
+	if type(packet) ~= "table" then return end
+	if type(packet.NextSequence) == "number" then nextSequence = math.max(nextSequence, packet.NextSequence) end
+	if packet.Sequence ~= nil and packet.Sequence ~= activeSequence then return end
+	if packet.Status == "Started" then
+		startAnimation(packet.Code, tonumber(packet.Duration) or Config.SpinDuration)
+		return
+	end
+	if packet.Status == "Error" and packet.ErrorCode == "Busy" and busy then return end
+	if packet.Status ~= "Success" and packet.Status ~= "Cancelled" and packet.Status ~= "Error" then return end
+	stopAnimation()
+	busy = false
+	activeSequence = nil
+	if packet.Status == "Success" and packet.Item then
+		local item = packet.Item
+		resultLabel.Text = item.DisplayNumber
+		detailsLabel.Text = string.format("%s · Продажа: %s ₽\nДоход в слоте: %s ₽/ч", item.RarityName, formatMoney(item.SalePrice), formatMoney(item.IncomePerHour))
+		statusLabel.Text = string.format("Номер добавлен в коллекцию: %d/%d", packet.InventoryCount or 0, player:GetAttribute("InventoryCapacity") or 25)
+	elseif packet.Status == "Cancelled" then
+		resultLabel.Text = "Выдача отменена"
+		detailsLabel.Text = "Стоимость прокрутки возвращена"
+		statusLabel.Text = packet.Reason or "Попробуйте ещё раз."
+	else
+		statusLabel.Text = packet.Message or "Не удалось выполнить прокрутку."
+	end
+	refreshControls()
+end)
+
+spinButton.Activated:Connect(function()
+	if busy or not spinButton.Active or not selectedOffer then return end
+	busy = true
+	activeSequence = nextSequence
+	local sequence = activeSequence
+	local code = selectedOffer.Code
+	detailsLabel.Text = "Ожидаем ответ терминала"
+	statusLabel.Text = "Отправляем запрос..."
+	refreshControls()
+	requestRemote:FireServer(code, sequence)
+	task.delay(60, function()
+		if busy and activeSequence == sequence then
+			stopAnimation()
+			statusLabel.Text = "Выдача задерживается. Дождитесь ответа или переподключитесь."
+		end
+	end)
+end)
+
+for _, attribute in {"DataReady", "NextSpinSequence", "InventoryCount", "InventoryCapacity"} do
+	player:GetAttributeChangedSignal(attribute):Connect(refreshControls)
+end
+window:GetAttributeChangedSignal("SelectedCode"):Connect(refreshControls)
+task.spawn(function()
+	local stats = player:WaitForChild("leaderstats", 30)
+	if not stats then return end
+	balanceValue = stats:WaitForChild("Рубли", 10)
+	if not balanceValue then return end
+	balanceValue:GetPropertyChangedSignal("Value"):Connect(refreshControls)
+	refreshControls()
+end)
+refreshControls()
+</ProtectedString>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+</roblox>

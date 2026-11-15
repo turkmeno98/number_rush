@@ -1,0 +1,442 @@
+{
+  "counts": [
+    4764478,
+    5078404,
+    134600,
+    22230,
+    278,
+    10
+  ],
+  "mean_digit_multiplier": [
+    1.487295680660085,
+    1.4828971801827053,
+    1.483083315644237,
+    1.485,
+    1.4822456320657758,
+    1.485
+  ],
+  "offers": [
+    {
+      "operator": "БиЛайнк",
+      "code_id": "Б1",
+      "cost": 5000,
+      "prestige": 1.0,
+      "percentages": [
+        55,
+        43,
+        1.85,
+        0.149,
+        0.00099,
+        1e-05
+      ],
+      "expected_base_sale": 1152.71,
+      "expected_sale_vip_and_both_max_buffs": 6479.62,
+      "base_above_floor_percent": 45.0,
+      "vip_boost_above_floor_percent": 76.59574468085107
+    },
+    {
+      "operator": "Мобител",
+      "code_id": "М1",
+      "cost": 6000,
+      "prestige": 1.03,
+      "percentages": [
+        50,
+        47.5,
+        2.3,
+        0.199,
+        0.00099,
+        1e-05
+      ],
+      "expected_base_sale": 1245.99,
+      "expected_sale_vip_and_both_max_buffs": 6903.05,
+      "base_above_floor_percent": 50.0,
+      "vip_boost_above_floor_percent": 80.0
+    },
+    {
+      "operator": "МегаЛинк",
+      "code_id": "Г1",
+      "cost": 7000,
+      "prestige": 1.06,
+      "percentages": [
+        45,
+        52,
+        2.75,
+        0.249,
+        0.00099,
+        1e-05
+      ],
+      "expected_base_sale": 1342.7,
+      "expected_sale_vip_and_both_max_buffs": 7313.14,
+      "base_above_floor_percent": 54.99999999999999,
+      "vip_boost_above_floor_percent": 83.0188679245283
+    },
+    {
+      "operator": "ТелеНова",
+      "code_id": "Т1",
+      "cost": 8000,
+      "prestige": 1.09,
+      "percentages": [
+        40,
+        56.5,
+        3.2,
+        0.299,
+        0.00099,
+        1e-05
+      ],
+      "expected_base_sale": 1442.82,
+      "expected_sale_vip_and_both_max_buffs": 7712.03,
+      "base_above_floor_percent": 60.0,
+      "vip_boost_above_floor_percent": 85.71428571428572
+    },
+    {
+      "operator": "БиЛайнк",
+      "code_id": "Б2",
+      "cost": 15000,
+      "prestige": 1.12,
+      "percentages": [
+        0,
+        94,
+        5.8,
+        0.199,
+        0.00099,
+        1e-05
+      ],
+      "expected_base_sale": 1885.12,
+      "expected_sale_vip_and_both_max_buffs": 10895.02,
+      "base_above_floor_percent": 6.0,
+      "vip_boost_above_floor_percent": 20.33898305084746
+    },
+    {
+      "operator": "Мобител",
+      "code_id": "М2",
+      "cost": 18000,
+      "prestige": 1.15,
+      "percentages": [
+        0,
+        90,
+        9.7,
+        0.299,
+        0.00099,
+        1e-05
+      ],
+      "expected_base_sale": 2084.03,
+      "expected_sale_vip_and_both_max_buffs": 12917.54,
+      "base_above_floor_percent": 10.0,
+      "vip_boost_above_floor_percent": 30.769230769230766
+    },
+    {
+      "operator": "МегаЛинк",
+      "code_id": "Г2",
+      "cost": 20000,
+      "prestige": 1.18,
+      "percentages": [
+        0,
+        86,
+        13.6,
+        0.399,
+        0.00099,
+        1e-05
+      ],
+      "expected_base_sale": 2290.68,
+      "expected_sale_vip_and_both_max_buffs": 14730.21,
+      "base_above_floor_percent": 14.000000000000002,
+      "vip_boost_above_floor_percent": 39.43661971830986
+    },
+    {
+      "operator": "ТелеНова",
+      "code_id": "Т2",
+      "cost": 25000,
+      "prestige": 1.21,
+      "percentages": [
+        0,
+        80,
+        19.5,
+        0.499,
+        0.00099,
+        1e-05
+      ],
+      "expected_base_sale": 2576.86,
+      "expected_sale_vip_and_both_max_buffs": 16878.15,
+      "base_above_floor_percent": 20.0,
+      "vip_boost_above_floor_percent": 50.0
+    },
+    {
+      "operator": "БиЛайнк",
+      "code_id": "Б3",
+      "cost": 35000,
+      "prestige": 1.24,
+      "percentages": [
+        0,
+        0,
+        99.5,
+        0.49,
+        0.0099,
+        0.0001
+      ],
+      "expected_base_sale": 5599.75,
+      "expected_sale_vip_and_both_max_buffs": 26293.07,
+      "base_above_floor_percent": 0.5,
+      "vip_boost_above_floor_percent": 1.9704433497536948
+    },
+    {
+      "operator": "Мобител",
+      "code_id": "М3",
+      "cost": 40000,
+      "prestige": 1.26,
+      "percentages": [
+        0,
+        0,
+        99,
+        0.99,
+        0.0099,
+        0.0001
+      ],
+      "expected_base_sale": 5755.59,
+      "expected_sale_vip_and_both_max_buffs": 27840.55,
+      "base_above_floor_percent": 0.9999999999999999,
+      "vip_boost_above_floor_percent": 3.883495145631067
+    },
+    {
+      "operator": "МегаЛинк",
+      "code_id": "Г3",
+      "cost": 45000,
+      "prestige": 1.28,
+      "percentages": [
+        0,
+        0,
+        98,
+        1.98,
+        0.0198,
+        0.0002
+      ],
+      "expected_base_sale": 5998.87,
+      "expected_sale_vip_and_both_max_buffs": 30786.98,
+      "base_above_floor_percent": 1.9999999999999998,
+      "vip_boost_above_floor_percent": 7.547169811320753
+    },
+    {
+      "operator": "ТелеНова",
+      "code_id": "Т3",
+      "cost": 50000,
+      "prestige": 1.3,
+      "percentages": [
+        0,
+        0,
+        97,
+        2.97,
+        0.0297,
+        0.0003
+      ],
+      "expected_base_sale": 6246.88,
+      "expected_sale_vip_and_both_max_buffs": 33671.65,
+      "base_above_floor_percent": 3.0,
+      "vip_boost_above_floor_percent": 11.009174311926607
+    }
+  ],
+  "simulations": {
+    "Б1": {
+      "n": 10000,
+      "seed": 20261115,
+      "30min": {
+        "rolls": {
+          "10": 27.0,
+          "50": 30.0,
+          "90": 34.0
+        },
+        "cash": {
+          "10": 1404.67,
+          "50": 3016.33,
+          "90": 4619.7
+        },
+        "hourly_income": {
+          "10": 30000.0,
+          "50": 50000.0,
+          "90": 90000.0
+        },
+        "cash_plus_liquidation": {
+          "10": 9716.87,
+          "50": 12474.67,
+          "90": 17212.23
+        },
+        "income_earned": {
+          "10": 14900.0,
+          "50": 24866.67,
+          "90": 44700.0
+        },
+        "sales": {
+          "10": 19470.9,
+          "50": 23892.0,
+          "90": 29536.1
+        }
+      },
+      "24h": {
+        "rolls": {
+          "10": 85.0,
+          "50": 126.0,
+          "90": 188.0
+        },
+        "cash": {
+          "10": 541773.9,
+          "50": 544607.83,
+          "90": 1263061.9
+        },
+        "hourly_income": {
+          "10": 90000.0,
+          "50": 90000.0,
+          "90": 210000.0
+        },
+        "cash_plus_liquidation": {
+          "10": 554393.3,
+          "50": 568877.5,
+          "90": 1286062.3
+        },
+        "income_earned": {
+          "10": 779900.0,
+          "50": 1039800.0,
+          "90": 1819766.67
+        },
+        "sales": {
+          "10": 83758.2,
+          "50": 131578.0,
+          "90": 196034.8
+        }
+      }
+    },
+    "Б3": {
+      "n": 10000,
+      "seed": 20261115,
+      "30min": {
+        "rolls": {
+          "10": 6.0,
+          "50": 6.0,
+          "90": 6.0
+        },
+        "cash": {
+          "10": 21700.0,
+          "50": 21700.0,
+          "90": 21700.0
+        },
+        "hourly_income": {
+          "10": 270000.0,
+          "50": 270000.0,
+          "90": 270000.0
+        },
+        "cash_plus_liquidation": {
+          "10": 53001.0,
+          "50": 54888.0,
+          "90": 56961.0
+        },
+        "income_earned": {
+          "10": 131700.0,
+          "50": 131700.0,
+          "90": 131700.0
+        },
+        "sales": {
+          "10": 0.0,
+          "50": 0.0,
+          "90": 0.0
+        }
+      },
+      "24h": {
+        "rolls": {
+          "10": 65.0,
+          "50": 65.0,
+          "90": 66.0
+        },
+        "cash": {
+          "10": 1626957.9,
+          "50": 1648963.0,
+          "90": 1654091.0
+        },
+        "hourly_income": {
+          "10": 270000.0,
+          "50": 270000.0,
+          "90": 270000.0
+        },
+        "cash_plus_liquidation": {
+          "10": 1665883.9,
+          "50": 1687703.0,
+          "90": 1702078.2
+        },
+        "income_earned": {
+          "10": 3506700.0,
+          "50": 3506700.0,
+          "90": 3506700.0
+        },
+        "sales": {
+          "10": 315323.9,
+          "50": 321280.0,
+          "90": 333394.2
+        }
+      }
+    },
+    "Т3": {
+      "n": 10000,
+      "seed": 20261115,
+      "30min": {
+        "rolls": {
+          "10": 4.0,
+          "50": 4.0,
+          "90": 4.0
+        },
+        "cash": {
+          "10": 9200.0,
+          "50": 9200.0,
+          "90": 9200.0
+        },
+        "hourly_income": {
+          "10": 270000.0,
+          "50": 270000.0,
+          "90": 270000.0
+        },
+        "cash_plus_liquidation": {
+          "10": 30845.0,
+          "50": 32572.0,
+          "90": 46057.7
+        },
+        "income_earned": {
+          "10": 109200.0,
+          "50": 109200.0,
+          "90": 109200.0
+        },
+        "sales": {
+          "10": 0.0,
+          "50": 0.0,
+          "90": 0.0
+        }
+      },
+      "24h": {
+        "rolls": {
+          "10": 43.0,
+          "50": 43.0,
+          "90": 45.0
+        },
+        "cash": {
+          "10": 1640539.0,
+          "50": 1645997.0,
+          "90": 2712221.9
+        },
+        "hourly_income": {
+          "10": 270000.0,
+          "50": 270000.0,
+          "90": 450000.0
+        },
+        "cash_plus_liquidation": {
+          "10": 1681732.7,
+          "50": 1698735.0,
+          "90": 2777788.2
+        },
+        "income_earned": {
+          "10": 3484200.0,
+          "50": 3484200.0,
+          "90": 4654200.0
+        },
+        "sales": {
+          "10": 206421.0,
+          "50": 211825.0,
+          "90": 228902.7
+        }
+      }
+    }
+  }
+}

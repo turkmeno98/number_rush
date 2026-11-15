@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.DS_Store
+*.rbxl.lock
+*.rbxlx.lock
+*.rbxl.autosave
+*.rbxlx.autosave
+.env
+.env.*
+!.env.example
+node_modules/
+analysis/**/pattern_hist.npz
