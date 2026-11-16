@@ -107,7 +107,7 @@ def build():
     ET.ElementTree(root).write(output, encoding='utf-8', xml_declaration=True)
 
     manifest = {
-        'checkpoint': '2026-11-16-step-36-branching-income-ui',
+        'checkpoint': '2026-11-16-step-37-retro-office',
         'provenance': 'Reconstructed from latest conversation code, not exported from user Studio',
         'original_rbxl_received': False,
         'generated_place': output.relative_to(ROOT).as_posix(),

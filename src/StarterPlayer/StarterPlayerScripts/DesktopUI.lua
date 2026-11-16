@@ -1045,7 +1045,20 @@ function DesktopUI.Start()
 			end
 		end
 	end)
-	selectOperator(1); renderPlayers(); renderTop(); renderCollection(); refreshControls(); showPage("terminal")
+	game:GetService("ProximityPromptService").PromptTriggered:Connect(function(prompt)
+		if prompt.Name ~= "OfficePrompt" then return end
+		local target = prompt.Parent
+		if target:GetAttribute("OfficeIndex") ~= player:GetAttribute("OfficeIndex") then
+			status.Text = "Это кабинет другого абонента. Ваш кабинет №" .. tostring(player:GetAttribute("OfficeIndex") or "—")
+			return
+		end
+		local page = target:GetAttribute("OfficePage")
+		if page == "terminal" then showPage("terminal")
+		elseif page == "collection" or page == "slots" then
+			showPage("collection"); setCollectionMode(page == "slots" and "slots" or "numbers")
+		end
+	end)
+	selectOperator(1); renderPlayers(); renderTop(); renderCollection(); refreshControls(); setExpanded(false)
 	window.BackgroundTransparency = 1
 	TweenService:Create(window, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
 end

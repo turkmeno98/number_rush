@@ -1,5 +1,5 @@
 {
-  "checkpoint": "2026-11-16-step-36-branching-income-ui",
+  "checkpoint": "2026-11-16-step-37-retro-office",
   "provenance": "Reconstructed from latest conversation code, not exported from user Studio",
   "original_rbxl_received": false,
   "generated_place": "places/NUMBER_RUSH_reconstructed.rbxlx",
@@ -65,6 +65,18 @@
       "sha256": "1b4de1cc73f1c431af490dcac0f7eae18cc6f56e8dba9a9efd63e5e45699014f"
     },
     {
+      "source": "src/ServerScriptService/OfficeScene.lua",
+      "studio_path": "ServerScriptService/OfficeScene",
+      "class": "ModuleScript",
+      "sha256": "84989e2ba1c2cd4e0c16978830b616f5e5d9c8cf28e934565f5b88d02a3d9c51"
+    },
+    {
+      "source": "src/ServerScriptService/OfficeService.server.lua",
+      "studio_path": "ServerScriptService/OfficeService",
+      "class": "Script",
+      "sha256": "36c47c5a62797581071194f610686e32dd144927e16fd7705cf66d1e8c2f8512"
+    },
+    {
       "source": "src/ServerScriptService/OnlineIncomeService.lua",
       "studio_path": "ServerScriptService/OnlineIncomeService",
       "class": "ModuleScript",
@@ -104,7 +116,7 @@
       "source": "src/StarterPlayer/StarterPlayerScripts/DesktopUI.lua",
       "studio_path": "StarterPlayer/StarterPlayerScripts/DesktopUI",
       "class": "ModuleScript",
-      "sha256": "746d0ce686b10ded5c383f5538bddc2ef883a98fff59290f1f124095712cc88d"
+      "sha256": "b6cae25d284246b373f4133434ad2d08f36d346ae2a57137a65d270e6cf18ab1"
     },
     {
       "source": "src/StarterPlayer/StarterPlayerScripts/IncomeSlotUI.client.lua",
