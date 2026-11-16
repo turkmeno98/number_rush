@@ -32,7 +32,7 @@
       "source": "src/ServerScriptService/GameServer.server.lua",
       "studio_path": "ServerScriptService/GameServer",
       "class": "Script",
-      "sha256": "c1cd48aa0b435732aca7ddfb35e72e9f6de0be859133c45bff712250bfd1f262"
+      "sha256": "77ed3637a666f78cb9c81e36482a38d667a781a3dab6a9b90299b90ea8145c1c"
     },
     {
       "source": "src/ServerScriptService/IncomeSlotService.lua",

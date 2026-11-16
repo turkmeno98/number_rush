@@ -621,16 +621,18 @@ local function setupPlayer(player)
 	if not saleRecovered or not upgradesReady then
 		stopSession(player, "Не удалось восстановить операции профиля. Переподключитесь позже."); return
 	end
-	local slots, slotError, slotDetails = IncomeSlotService.Initialize(session)
 	local incomeUpdated = pcall(NumberEconomy.RefreshIncome, session.Data)
-	if not incomeUpdated or not PlayerDataStore.Save(session, false) then
+	if not incomeUpdated then
 		stopSession(player, "Не удалось обновить расчёт дохода. Переподключитесь позже."); return
 	end
-	slots, slotError, slotDetails = IncomeSlotService.Initialize(session)
+	local slots, slotError, slotDetails = IncomeSlotService.Initialize(session)
 	if not slots then
 		warn("NUMBER RUSH: проверка слотов: " .. tostring(slotDetails or slotError))
 		stopSession(player, "Не удалось проверить доходные слоты. Подключитесь немного позже.")
 		return
+	end
+	if not PlayerDataStore.Save(session, false) then
+		stopSession(player, "Не удалось сохранить расчёт дохода. Переподключитесь позже."); return
 	end
 	local leaderstats = Instance.new("Folder")
 	leaderstats.Name = "leaderstats"
