@@ -188,6 +188,8 @@ local function setupPlayer(player)
 end
 
 local messages = {
+	InvalidBatch = "Выберите от одного до трёх номеров. Пропуск ×4 ещё не подключён.",
+	BatchLocked = "Сначала откройте эту ступень параллельной выдачи в прокачке.",
 	InvalidRegion = "Выберите доступного оператора и регион.",
 	InvalidCode = "Выберите доступный код.",
 	InvalidSequence = "Обновите выбор и повторите попытку.",
@@ -207,7 +209,7 @@ local function sendError(player, session, sequence, code)
 	})
 end
 
-spinRequest.OnServerEvent:Connect(function(player, operatorId, regionId, sequence)
+spinRequest.OnServerEvent:Connect(function(player, operatorId, regionId, sequence, batchCount)
 	local session = sessions[player]
 	if not session or player:GetAttribute("DataReady") ~= true then sendError(player, session, nil, "SessionUnavailable"); return end
 	local now = os.clock()
@@ -220,16 +222,19 @@ spinRequest.OnServerEvent:Connect(function(player, operatorId, regionId, sequenc
 	if type(sequence) ~= "number" or sequence % 1 ~= 0 or sequence < 1 or sequence > 1000000000 then sendError(player, session, nil, "InvalidSequence"); return end
 	local lastSpin = session.Data.LastSpin
 	local repeated = lastSpin and lastSpin.Sequence == sequence
+	batchCount = batchCount or 1
+	if type(batchCount) ~= "number" or batchCount % 1 ~= 0 or batchCount < 1 or batchCount > 3 then sendError(player, session, sequence, "InvalidBatch"); return end
 	if not repeated then
+		if batchCount > 1 + UpgradeRules.Level(session.Data, "Batch") then sendError(player, session, sequence, "BatchLocked"); return end
 		if sequence ~= (session.Data.NextSpinSequence or 1) then sendError(player, session, sequence, "StaleRequest"); return end
-		if session.Data.Balance < offer.Price then sendError(player, session, sequence, "NotEnoughMoney"); return end
+		if session.Data.Balance < offer.Price * batchCount then sendError(player, session, sequence, "NotEnoughMoney"); return end
 		local count = 0
 		for _ in pairs(session.Data.Inventory) do count += 1 end
-		if count >= session.Data.InventoryCapacity then sendError(player, session, sequence, "InventoryFull"); return end
+		if count + batchCount > session.Data.InventoryCapacity then sendError(player, session, sequence, "InventoryFull"); return end
 	end
 	session.RequestBusy = true
 	if not repeated then send(player, {Status = "Started", Sequence = sequence, OperatorId = operatorId, RegionId = regionId, Duration = UpgradeRules.Duration(Config.SpinDuration, UpgradeRules.Level(session.Data, "Speed"))}) end
-	local receipt, errorCode, details = SpinService.Start(session, operatorId, regionId, sequence)
+	local receipt, errorCode, details = SpinService.Start(session, operatorId, regionId, sequence, batchCount)
 	session.RequestBusy = false
 	if not receipt then
 		warn("NUMBER RUSH: прокрутка: " .. tostring(errorCode) .. " " .. tostring(details or ""))

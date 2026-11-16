@@ -2,6 +2,12 @@
 local Players = game:GetService("Players")
 local office = require(script.Parent:WaitForChild("OfficeScene")).Build()
 if not office then warn("NUMBER RUSH: office scene is missing"); return end
+local reception=office:FindFirstChild("Reception")
+if reception then
+	local npc=reception:FindFirstChild("SeniorOperator")
+	local seat=reception:FindFirstChild("NPCSeat")
+	if npc and seat then task.defer(function() seat:Sit(npc:FindFirstChildOfClass("Humanoid")) end) end
+end
 local cabins, owners, connections = {}, {}, {}
 for _, cabin in ipairs(office:GetChildren()) do
 	local index = cabin:GetAttribute("OfficeIndex")

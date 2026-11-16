@@ -182,7 +182,7 @@ function DesktopUI.Start()
 	label(wallpaper, "Watermark", "NUMBER RUSH\nГородской узел связи", UDim2.new(1, -250, 1, -130), UDim2.fromOffset(230, 60), 23, Color3.fromRGB(220, 244, 215), true, 3).TextXAlignment = Enum.TextXAlignment.Right
 	local currentPage, balanceValue = "terminal", nil
 	local showPage, renderCollection, renderSlots, renderTop, renderPlayers, refreshControls, renderProfile
-	local progress = {Busy = false, Auto = false, Uncertain = false, Render = function() end}
+	local progress = {Busy = false, Auto = false, Uncertain = false, Count = 1, LastBatch = nil, Render = function() end}
 	local profilePlayer = player
 	local currentItems, inventory = {}, nil
 	local slotState, slotReceivedAt, slotBusy, slotUncertain = nil, 0, false, false
@@ -211,7 +211,7 @@ function DesktopUI.Start()
 	local menuLabel = label(sidebar, "Title", "АБОНЕНТСКИЙ ОТДЕЛ", UDim2.fromOffset(8, 4), UDim2.new(1, -16, 0, 24), 9, C.blue, true)
 	menuLabel.TextXAlignment = Enum.TextXAlignment.Center
 	local menus = {
-		{"terminal", "ТЕРМИНАЛ", C.blue}, {"collection", "НОМЕРА", C.blue}, {"profile", "ПРОФИЛЬ", C.blue},
+		{"terminal", "ТЕРМИНАЛ", C.blue}, {"collection", "НОМЕРА", C.blue},
 		{"mail", "ПОЧТА", C.blue}, {"settings", "НАСТРОЙКИ", C.muted}, {"upgrades", "ПРОКАЧКА", C.purple},
 		{"top", "РЕЙТИНГ", C.gold},
 	}
@@ -230,19 +230,22 @@ function DesktopUI.Start()
 	local rosterList = scroll(roster, "Players", UDim2.fromOffset(8, 38), UDim2.new(1, -14, 1, -42)); listLayout(rosterList, 5)
 	local hud = frame(root, "Taskbar", UDim2.new(0.5, -310, 1, -76), UDim2.fromOffset(620, 64), C.cream, 8)
 	corner(hud, 5); stroke(hud, C.blue, 2)
-	local terminalButton = button(hud, "Terminal", "ПК", UDim2.fromOffset(7, 7), UDim2.fromOffset(82, 50), function() if expanded then setExpanded(false) else showPage("terminal") end end, C.green, 9)
+	local terminalButton = button(hud, "Terminal", "ПК", UDim2.fromOffset(7, 7), UDim2.fromOffset(82, 50), function() if progress.Window and progress.Window.Visible and currentPage == "terminal" then setExpanded(false) else showPage("terminal") end end, C.green, 9)
 	terminalButton.TextColor3 = Color3.new(1, 1, 1); terminalButton.TextSize = 21
 	label(hud, "BalanceTitle", "ЛИЦЕВОЙ СЧЁТ", UDim2.fromOffset(106, 7), UDim2.fromOffset(200, 16), 10, C.muted, true, 9)
 	local balanceLabel = label(hud, "Balance", "Загрузка...", UDim2.fromOffset(105, 22), UDim2.fromOffset(250, 32), 26, C.ink, true, 9)
 	local capacityButton = label(hud, "Collection", "SIM: 0/25", UDim2.new(1, -246, 0, 8), UDim2.fromOffset(116, 47), 14, C.blue, true, 9)
 	local subscribers = button(hud, "Subscribers", "Абоненты", UDim2.new(1, -122, 0, 8), UDim2.fromOffset(112, 47), function() rosterPreference = not roster.Visible; roster.Visible = rosterPreference end, C.pale, 9)
+	local profileShortcut = button(hud, "Profile", "", UDim2.new(1, -300, 0, 8), UDim2.fromOffset(40, 47), function() profilePlayer = player; showPage("profile") end, C.paper, 9)
+	local profileArt = icon(profileShortcut, "profile", C.blue); profileArt.Position = UDim2.fromOffset(3, 5); create("UIScale", profileArt, {Scale = 0.72})
 	local window = frame(root, "Window", UDim2.new(0.5, -340, 0.5, -260), UDim2.fromOffset(680, 520), C.cream, 10)
+	progress.Window = window
 	corner(window, 5); stroke(window, C.blue, 3)
 	local header = frame(window, "TitleBar", UDim2.fromOffset(0, 0), UDim2.new(1, 0, 0, 38), C.blue, 11)
 	gradient(header, C.blueLight, C.blue)
 	local headerIcon = icon(header, "terminal", Color3.new(1, 1, 1)); headerIcon.Position = UDim2.fromOffset(10, 9)
 	create("UIScale", headerIcon, {Scale = 0.52})
-	local windowTitle = label(header, "Title", "NUMBER RUSH — ТЕРМИНАЛ", UDim2.fromOffset(49, 0), UDim2.new(1, -125, 1, 0), 16, Color3.new(1, 1, 1), true, 12)
+	local windowTitle = label(header, "Title", "NUMBER RUSH — ТЕРМИНАЛ", UDim2.fromOffset(49, 0), UDim2.new(1, -125, 1, 0), 14, Color3.new(1, 1, 1), true, 12)
 	button(header, "Maximize", "[]", UDim2.new(1, -62, 0, 7), UDim2.fromOffset(24, 24), function() maximized = not maximized; layoutDesktop() end, C.blueLight, 12).TextColor3 = Color3.new(1, 1, 1)
 	button(header, "Close", "X", UDim2.new(1, -31, 0, 7), UDim2.fromOffset(24, 24), function() setExpanded(false) end, C.red, 12).TextColor3 = Color3.new(1, 1, 1)
 	local body = frame(window, "Body", UDim2.fromOffset(14, 50), UDim2.new(1, -28, 1, -84), C.cream, 11)
@@ -336,9 +339,33 @@ function DesktopUI.Start()
 	number.Font = Enum.Font.Code; number.TextXAlignment = Enum.TextXAlignment.Center
 	local resultDetails = label(ticket, "Details", "Все шесть редкостей · единые шансы", UDim2.new(0, 16, 1, -58), UDim2.new(1, -32, 0, 38), 13, C.muted)
 	resultDetails.TextXAlignment = Enum.TextXAlignment.Center
-	local spinButton = button(generator, "SpinButton", "ПОЛУЧИТЬ НОМЕР", UDim2.new(0, 0, 1, -66), UDim2.new(1, 0, 0, 43), nil, C.green)
+	local spinButton = button(generator, "SpinButton", "ПОЛУЧИТЬ НОМЕР", UDim2.new(0, 156, 1, -66), UDim2.new(1, -156, 0, 43), nil, C.green)
 	spinButton.TextColor3 = Color3.new(1, 1, 1); spinButton.TextSize = 17
-	progress.SellResult = button(generator, "SellResult", "Продать номер", UDim2.new(0, 0, 1, -105), UDim2.new(1, 0, 0, 30), function() progress.ConfirmSale(lastItem) end, C.paper)
+	progress.BatchButtons = {}
+	for count = 1, 4 do
+		progress.BatchButtons[count] = button(generator, "Batch" .. count, "×" .. count, UDim2.new(0, (count - 1) * 38, 1, -66), UDim2.fromOffset(34, 43), function()
+			if spinBusy then return end
+			if count == 4 then information("Пропуск ×4", {"Постоянный пропуск появится позже. Цена в Robux ещё не установлена. Покупка сейчас недоступна."}); return end
+			if count > 1 + (player:GetAttribute("UpgradeBatch") or 0) then showPage("upgrades"); return end
+			progress.Count = count; refreshControls()
+		end, C.paper)
+	end
+	progress.ShowBatch = function()
+		clear(modalContent); modalTitle.Text = "Результаты выдачи ×" .. tostring(#(progress.LastBatch or {})); modal.Visible = true; modalAction.Visible = false; modalActionCallback = nil
+		modalContent.Size = UDim2.new(1, -36, 1, -62)
+		for i, item in ipairs(progress.LastBatch or {}) do
+			local own = nil; for _, current in ipairs(currentItems) do if current.IssuanceId == item.IssuanceId then own = current end end
+			local color = rarityColors[item.RarityIndex or 1]
+			local card = frame(modalContent, "Result" .. i, UDim2.new(((i - 1) % 2) * 0.5, 3, 0, math.floor((i - 1) / 2) * 134 + 3), UDim2.new(0.5, -10, 0, 124), C.paper, 27); corner(card, 4); stroke(card, color, 2)
+			label(card, "Rarity", item.RarityName, UDim2.fromOffset(8, 4), UDim2.new(1, -16, 0, 18), 11, color, true, 28)
+			label(card, "Number", item.DisplayNumber, UDim2.fromOffset(8, 25), UDim2.new(1, -16, 0, 28), 14, C.ink, true, 28)
+			label(card, "Income", money(item.IncomePerHour) .. " ₽/ч", UDim2.fromOffset(8, 56), UDim2.new(1, -16, 0, 20), 12, C.green, true, 28)
+			local sell = button(card, "Sell", own and ("Продать · " .. money(item.SalePrice) .. " ₽") or "Номер не в списке", UDim2.fromOffset(8, 85), UDim2.new(1, -16, 0, 29), function() progress.ConfirmSale(own) end, C.pale, 29)
+			enabled(sell, own ~= nil and own.Location == "Inventory" and not progress.Busy)
+		end
+		modalContent.CanvasSize = UDim2.fromOffset(0, math.ceil(#(progress.LastBatch or {}) / 2) * 134 + 6)
+	end
+	progress.SellResult = button(generator, "SellResult", "Продать номер", UDim2.new(0, 0, 1, -105), UDim2.new(1, 0, 0, 30), function() if progress.LastBatch then progress.ShowBatch() else progress.ConfirmSale(lastItem) end end, C.paper)
 	progress.SellResult.Visible = false
 	local generatorNote = label(generator, "Timing", "Одна SIM-карта · 6 секунд · оплата только на сервере", UDim2.new(0, 0, 1, -18), UDim2.new(1, 0, 0, 18), 10, C.muted)
 	local regionPopup = frame(generator, "RegionPopup", UDim2.fromOffset(0, 0), UDim2.fromScale(1, 1), C.paper, 15)
@@ -554,8 +581,9 @@ function DesktopUI.Start()
 	label(intro, "Title", "Модернизация узла связи", UDim2.fromOffset(66, 7), UDim2.new(1, -78, 0, 26), 19, C.blue, true)
 	label(intro, "Hint", "Постоянные улучшения за игровые рубли", UDim2.fromOffset(66, 35), UDim2.new(1, -78, 0, 25), 12, C.ink)
 	local tree = scroll(upgrades, "UpgradeTree", UDim2.fromOffset(0, 80), UDim2.new(1, 0, 1, -80)); listLayout(tree, 10)
-	local colors = {Storage = C.blue, Slots = C.green, Luck = C.purple, Speed = C.gold, Auto = C.blue}
+	local colors = {Storage = C.blue, Slots = C.green, Luck = C.purple, Speed = C.gold, Auto = C.blue, Batch = C.purple}
 	progress.Render = function()
+		if not gui.Parent then return end
 		clear(tree)
 		for order, key in ipairs(UpgradeRules.Order) do
 			local branch = UpgradeRules.Branches[key]
@@ -581,6 +609,7 @@ function DesktopUI.Start()
 			end, price and C.pale or C.cream)
 			enabled(buy, not locked and price ~= nil and not progress.Busy and not progress.Uncertain and not spinBusy and not slotBusy and player:GetAttribute("DataReady") == true and balanceValue ~= nil and balanceValue.Value >= (price or 0))
 		end
+		local premium = label(tree, "PremiumBatch", "×4 — постоянный пропуск. Цена и покупка будут подключены позже.", UDim2.fromOffset(0, 0), UDim2.new(1, -12, 0, 48), 13, C.gold); premium.LayoutOrder = 99
 	end
 	end
 	-- Current-server ranking, explicitly distinguished from the future global leaderboard.
@@ -762,12 +791,8 @@ function DesktopUI.Start()
 	-- Desktop routing and viewport layout: no changes to Roblox's native player list.
 	local pageTitles = {terminal = "ТЕРМИНАЛ ВЫДАЧИ", collection = "СПИСОК НОМЕРОВ", upgrades = "ПРОКАЧКА", trade = "ТОРГИ", quests = "ЗАДАНИЯ", top = "РЕЙТИНГ", shop = "МАГАЗИН", profile = "ПРОФИЛЬ АБОНЕНТА", boosts = "ИНВЕНТАРЬ БУСТОВ", mail = "ПОЧТА", settings = "НАСТРОЙКИ"}
 	showPage = function(key)
-		if key == "terminal" then
-			if not expanded then setExpanded(true) end
-		else
-			if expanded then setExpanded(false) end
-			compact.Visible = false
-		end
+		if expanded then setExpanded(false) end
+		compact.Visible = false
 		modal.Visible = false; regionPopup.Visible = false; currentPage = key; window.Visible = true
 		windowTitle.Text = "NUMBER RUSH — " .. pageTitles[key]
 		for name, page in pairs(pages) do page.Visible = name == key end
@@ -782,8 +807,8 @@ function DesktopUI.Start()
 	layoutDesktop = function()
 		local size = root.AbsoluteSize; local narrow = size.X < 1050
 		local sideWidth = 164
-		sidebar.Size = UDim2.fromOffset(sideWidth, 295)
-		sidebar.Position = UDim2.fromOffset(10, math.max(53, (size.Y - 295) / 2 - 15))
+		sidebar.Size = UDim2.fromOffset(sideWidth, 224)
+		sidebar.Position = UDim2.fromOffset(10, math.max(53, (size.Y - 224) / 2 - 15))
 		sidebar.BackgroundTransparency = 0.05; sidebar:FindFirstChildOfClass("UIStroke").Transparency = 0
 		menuLabel.Visible = false
 		for i, b in ipairs(menuButtons) do
@@ -797,8 +822,8 @@ function DesktopUI.Start()
 		end
 		roster.Visible = expanded and (rosterPreference == nil and size.X >= 1250 or rosterPreference == true)
 		local left = sideWidth + 28; local right = roster.Visible and size.X >= 1250 and 194 or 16
-		local width = math.min(700, size.X - left - right)
-		local height = math.min(620, size.Y - 128)
+		local width = math.min(560, size.X - left - right)
+		local height = math.min(500, size.Y - 128)
 		window.Size = UDim2.fromOffset(math.max(350, width), math.max(360, height))
 		window.Position = UDim2.fromOffset(left + math.max(0, (size.X - left - right - width) / 2), 54)
 		if maximized then width = size.X - 32; height = size.Y - 120; window.Size = UDim2.fromOffset(width, height); window.Position = UDim2.fromOffset(16, 50) end
@@ -848,6 +873,7 @@ function DesktopUI.Start()
 	end)
 	UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragOrigin = nil end end)
 	refreshControls = function()
+		if not gui.Parent then return end
 		local serverSequence = player:GetAttribute("NextSpinSequence")
 		if type(serverSequence) == "number" then nextSequence = math.max(nextSequence, serverSequence) end
 		local ready = player:GetAttribute("DataReady") == true
@@ -859,10 +885,15 @@ function DesktopUI.Start()
 		local capacity = player:GetAttribute("InventoryCapacity") or Config.StartingInventoryCapacity
 		local ownedResult = nil
 		for _, item in ipairs(currentItems) do if lastItem and item.IssuanceId == lastItem.IssuanceId then ownedResult = item end end
-		progress.SellResult.Visible = ownedResult ~= nil
+		progress.SellResult.Visible = ownedResult ~= nil or progress.LastBatch ~= nil
 		progress.SellResult.Text = ownedResult and (ownedResult.Location == "Inventory" and ("Продать за " .. money(ownedResult.SalePrice) .. " ₽") or "Номер установлен в доходный слот") or "Номер продан"
-		enabled(progress.SellResult, ownedResult ~= nil and ownedResult.Location == "Inventory" and not spinBusy and not slotBusy and not progress.Busy and not progress.Uncertain)
-		local canSpin = connected and ready and not spinBusy and not slotBusy and not progress.Busy and not progress.Uncertain and balanceValue ~= nil and nextSequence >= 1 and balanceValue.Value >= selectedOffer.Price and count < capacity
+		if progress.LastBatch then progress.SellResult.Text = "Результаты выдачи ×" .. #progress.LastBatch end
+		enabled(progress.SellResult, (progress.LastBatch ~= nil or ownedResult ~= nil and ownedResult.Location == "Inventory") and not spinBusy and not slotBusy and not progress.Busy and not progress.Uncertain)
+		for i, b in ipairs(progress.BatchButtons) do
+			enabled(b, not spinBusy and not progress.Busy); b.BackgroundColor3 = progress.Count == i and C.pale or C.paper
+			b.TextColor3 = i > 1 + (player:GetAttribute("UpgradeBatch") or 0) and C.muted or C.ink
+		end
+		local canSpin = connected and ready and not spinBusy and not slotBusy and not progress.Busy and not progress.Uncertain and balanceValue ~= nil and nextSequence >= 1 and balanceValue.Value >= selectedOffer.Price * progress.Count and count + progress.Count <= capacity
 		-- Keep buttons stable under the mouse while income updates the balance.
 		for _, key in ipairs(UpgradeRules.Order) do
 			local row = pages.upgrades.UpgradeTree:FindFirstChild(key)
@@ -872,19 +903,19 @@ function DesktopUI.Start()
 				enabled(row.Buy, not UpgradeRules.Requirement(levels, key) and price ~= nil and ready and not spinBusy and not slotBusy and not progress.Busy and not progress.Uncertain and balanceValue ~= nil and balanceValue.Value >= (price or 0))
 			end
 		end
-		if progress.Auto and (not ready or progress.Uncertain or balanceValue == nil or balanceValue.Value < selectedOffer.Price or count >= capacity) then progress.Auto = false end
+		if progress.Auto and (not ready or progress.Uncertain or balanceValue == nil or balanceValue.Value < selectedOffer.Price * progress.Count or count + progress.Count > capacity) then progress.Auto = false end
 		progress.AutoButton.Text = (player:GetAttribute("UpgradeAuto") or 0) < 1 and "Открыть авто" or progress.Auto and "Авто: вкл" or "Авто: выкл"
 		progress.AutoButton.BackgroundColor3 = progress.Auto and C.green or C.pale
 		progress.AutoButton.TextColor3 = progress.Auto and Color3.new(1, 1, 1) or C.ink
 		progress.MiniAuto.Text = progress.AutoButton.Text
 		progress.MiniAuto.BackgroundColor3 = progress.AutoButton.BackgroundColor3
 		progress.MiniAuto.TextColor3 = progress.AutoButton.TextColor3
-		generatorNote.Text = string.format("Одна SIM-карта · %.2f сек. · удача ×%.3f", UpgradeRules.Duration(Config.SpinDuration, player:GetAttribute("UpgradeSpeed") or 0), 1 + 0.015 * (player:GetAttribute("UpgradeLuck") or 0))
+		generatorNote.Text = string.format("Выдача ×%d · %.2f сек. · удача ×%.3f", progress.Count, UpgradeRules.Duration(Config.SpinDuration, player:GetAttribute("UpgradeSpeed") or 0), 1 + 0.015 * (player:GetAttribute("UpgradeLuck") or 0))
 		enabled(spinButton, canSpin == true)
 		enabled(miniSpin, canSpin == true)
-		miniSpin.Text = spinBusy and "ВЫДАЧА..." or (money(selectedOffer.Price) .. " ₽\nКРУТИТЬ")
+		miniSpin.Text = spinBusy and "ВЫДАЧА..." or (money(selectedOffer.Price * progress.Count) .. " ₽\nКРУТИТЬ ×" .. progress.Count)
 		miniOffer.Text = selectedOffer.OperatorName .. " · " .. selectedOffer.Region
-		spinButton.Text = spinBusy and "ПОЛУЧАЕМ НОМЕР..." or count >= capacity and "КОЛЛЕКЦИЯ ЗАПОЛНЕНА" or ("ПОЛУЧИТЬ · " .. money(selectedOffer.Price) .. " ₽")
+		spinButton.Text = spinBusy and "ПОЛУЧАЕМ НОМЕР..." or count >= capacity and "КОЛЛЕКЦИЯ ЗАПОЛНЕНА" or ("ПОЛУЧИТЬ · " .. money(selectedOffer.Price * progress.Count) .. " ₽ · ×" .. progress.Count)
 		for _, b in ipairs(operatorButtons) do enabled(b, not spinBusy) end
 		enabled(codeButton, not spinBusy)
 		if balanceValue then
@@ -927,7 +958,10 @@ function DesktopUI.Start()
 			animationToken = animationToken + 1; spinBusy = false; spinStarted = false; activeSequence = nil
 			punch.Rotation = 0; number.TextTransparency = 0
 			if packet.Status == "Success" and packet.Item then
-				displayItem(packet.Item); status.Text = "Номер выдан и сохранён. Откройте коллекцию для установки в слот."
+				displayItem(packet.Item); progress.LastBatch = packet.Items
+				status.Text = packet.Items and ("Получено номеров: " .. #packet.Items .. (packet.Refunded and (" · возвращено " .. money(packet.Refunded) .. " ₽") or "")) or "Номер выдан и сохранён."
+				if packet.Refunded then progress.Auto = false end
+				if packet.Items and not progress.Auto then task.defer(progress.ShowBatch) end
 			elseif packet.Status == "Cancelled" then
 				number.Text = "Выдача отменена"; resultDetails.Text = "Стоимость возвращена"; status.Text = packet.Reason or "Повторите попытку."
 			else status.Text = packet.Message or "Не удалось получить номер." end
@@ -954,7 +988,7 @@ function DesktopUI.Start()
 		operatorRibbon.BackgroundColor3 = brand.ThemeColor; ticketStroke.Color = brand.ThemeColor
 		resultDetails.Text = "Запрос отправлен на станцию"; number.TextColor3 = C.ink
 		status.Text = "Подключаемся к оператору..."; refreshControls()
-		requestRemote:FireServer(operatorId, regionId, sequence)
+		requestRemote:FireServer(operatorId, regionId, sequence, progress.Count)
 		task.delay(60, function()
 			if spinBusy and activeSequence == sequence then
 				animationToken = animationToken + 1
@@ -1002,7 +1036,7 @@ function DesktopUI.Start()
 	end
 	player.ChildAdded:Connect(function(child) if child.Name == "NumberInventory" and child:IsA("Folder") then bindInventory(child) end end)
 	local existing = player:FindFirstChild("NumberInventory"); if existing then bindInventory(existing) end
-	for _, attr in ipairs({"DataReady", "NextSpinSequence", "InventoryCount", "InventoryCapacity", "IncomeEnabled", "TotalBaseIncomePerHour", "UpgradeStorage", "UpgradeSlots", "UpgradeLuck", "UpgradeSpeed", "UpgradeAuto"}) do
+	for _, attr in ipairs({"DataReady", "NextSpinSequence", "InventoryCount", "InventoryCapacity", "IncomeEnabled", "TotalBaseIncomePerHour", "UpgradeStorage", "UpgradeSlots", "UpgradeLuck", "UpgradeSpeed", "UpgradeAuto", "UpgradeBatch"}) do
 		player:GetAttributeChangedSignal(attr):Connect(function()
 			refreshControls()
 			if attr:sub(1, 7) == "Upgrade" or attr == "DataReady" then progress.Render() end
@@ -1053,7 +1087,7 @@ function DesktopUI.Start()
 			return
 		end
 		local page = target:GetAttribute("OfficePage")
-		if page == "terminal" then showPage("terminal")
+		if page == "terminal" then maximized = false; showPage("terminal"); layoutDesktop()
 		elseif page == "collection" or page == "slots" then
 			showPage("collection"); setCollectionMode(page == "slots" and "slots" or "numbers")
 		end

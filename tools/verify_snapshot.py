@@ -54,7 +54,7 @@ assert 'WaitForChild("DesktopUI")' in bootstrap
 ui=(ROOT/'src/StarterPlayer/StarterPlayerScripts/DesktopUI.lua').read_text()
 assert instances['StarterPlayer/StarterPlayerScripts/DesktopUI'].get('class')=='ModuleScript'
 assert 'WaitForChild("leaderstats", 30)' in ui
-assert 'requestRemote:FireServer(operatorId, regionId, sequence)' in ui
+assert 'requestRemote:FireServer(operatorId, regionId, sequence, progress.Count)' in ui
 assert 'itemDetails' not in ui
 assert 'sidebar.Visible = true' in ui
 assert instances['ReplicatedStorage/RegionCatalog'].get('class')=='ModuleScript'

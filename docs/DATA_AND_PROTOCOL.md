@@ -1,3 +1,11 @@
+## Шаг 38 — пакетная выдача
+
+SpinRequest(operatorId, regionId, sequence, batchCount?), по умолчанию 1, сервер допускает 1..3 и проверяет Batch. Data.Upgrades.Batch=0..2, репликация UpgradeBatch. UpgradeTreeVersion=2 и SchemaVersion прежние.
+
+Для пакета PendingSpin дополнен BatchCount, BatchIndex, BatchDrafts, BatchItems, UnitPrice, BatchRoot. Price — стоимость ещё не выданных SIM. Все черновики и полная оплата сохраняются до Reserve. После каждого Confirm сохраняются предмет и переход к следующему кандидату; следующий OperationId = BatchRoot:индекс. Неизвестный результат записи требует восстановления, не новой оплаты. Старый одиночный журнал работает без этих полей.
+
+Success сохраняет прежний Item (последний) и новый Items для пакета. При исчерпании попыток возвращается только оставшаяся Price; уже выданные SIM остаются, квитанция Success/Items/Refunded/Reason. Если не выдано ничего — Cancelled. Повтор sequence возвращает LastSpin без выдачи/списания. Детали и границы проверок OFFICE_BATCH_V1.md.
+
 # Сохранения и сетевой протокол
 
 Шаг 36: UpgradeTreeVersion=2, IncomeFormulaVersion=2; схема DataStore прежняя. Перенос эффектов старых уровней и пересчёт дохода коллекции сохраняются перед DataReady. ProgressRequest/SpinRequest не изменены; новая ошибка UpgradeLocked. См. REFINEMENT_V2.md.

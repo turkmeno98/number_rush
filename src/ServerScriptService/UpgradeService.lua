@@ -22,6 +22,7 @@ function Service.Initialize(session)
 		data.Upgrades = levels
 	end
 	if type(data.Upgrades) ~= "table" then return nil, "RecoveryRequired" end
+	if data.Upgrades.Batch == nil then data.Upgrades.Batch = 0 end
 	for key, branch in pairs(Rules.Branches) do
 		local level = data.Upgrades[key]
 		if type(level) ~= "number" or level % 1 ~= 0 or level < 0 or level > #branch.Prices then return nil, "RecoveryRequired" end

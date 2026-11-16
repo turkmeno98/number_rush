@@ -1,5 +1,5 @@
 {
-  "checkpoint": "2026-11-16-step-37-retro-office",
+  "checkpoint": "2026-11-16-step-38-office-batch",
   "provenance": "Reconstructed from latest conversation code, not exported from user Studio",
   "original_rbxl_received": false,
   "generated_place": "places/NUMBER_RUSH_reconstructed.rbxlx",
@@ -26,13 +26,13 @@
       "source": "src/ReplicatedStorage/UpgradeConfig.lua",
       "studio_path": "ReplicatedStorage/UpgradeConfig",
       "class": "ModuleScript",
-      "sha256": "28125fe6236ef065e63104fa3906e6d60e9a87acf699210f0137ec249643bbee"
+      "sha256": "0d56fa085c3cbf98f5c9e7a90a79b2cc1d96f65845996765ebc3a3ec3a97c265"
     },
     {
       "source": "src/ServerScriptService/GameServer.server.lua",
       "studio_path": "ServerScriptService/GameServer",
       "class": "Script",
-      "sha256": "77ed3637a666f78cb9c81e36482a38d667a781a3dab6a9b90299b90ea8145c1c"
+      "sha256": "c4e225e697f90b1bccf1302d8176de5c45ae4959e6327b4e9986cdde3b256ab5"
     },
     {
       "source": "src/ServerScriptService/IncomeSlotService.lua",
@@ -68,13 +68,13 @@
       "source": "src/ServerScriptService/OfficeScene.lua",
       "studio_path": "ServerScriptService/OfficeScene",
       "class": "ModuleScript",
-      "sha256": "84989e2ba1c2cd4e0c16978830b616f5e5d9c8cf28e934565f5b88d02a3d9c51"
+      "sha256": "f5c91e7beec6fd550ba94d5678fd2b6ff33b6285259deba5518916801294a8ea"
     },
     {
       "source": "src/ServerScriptService/OfficeService.server.lua",
       "studio_path": "ServerScriptService/OfficeService",
       "class": "Script",
-      "sha256": "36c47c5a62797581071194f610686e32dd144927e16fd7705cf66d1e8c2f8512"
+      "sha256": "08152431959816d395f1c47593578c4a2271bbc9696a9d6e6b66c8804b1daee7"
     },
     {
       "source": "src/ServerScriptService/OnlineIncomeService.lua",
@@ -98,13 +98,13 @@
       "source": "src/ServerScriptService/SpinService.lua",
       "studio_path": "ServerScriptService/SpinService",
       "class": "ModuleScript",
-      "sha256": "d4c00a9dfbbc48e572fd63494179e90a5d5328f63161e88f5e7c469e5f807e44"
+      "sha256": "da290263f6c2ff78d72684f1c7b558a7762e93034fd93f9c6fb32664415be86e"
     },
     {
       "source": "src/ServerScriptService/UpgradeService.lua",
       "studio_path": "ServerScriptService/UpgradeService",
       "class": "ModuleScript",
-      "sha256": "f9796726d1afa10a6bacbbd7c16b881ac0de43759ebdc59b951a3175de51ce4c"
+      "sha256": "1c599ac6056b0a60e317671e02caf75ea811ba7759a8bdd1af1e209435872d0f"
     },
     {
       "source": "src/StarterPlayer/StarterPlayerScripts/CollectionUI.client.lua",
@@ -116,7 +116,7 @@
       "source": "src/StarterPlayer/StarterPlayerScripts/DesktopUI.lua",
       "studio_path": "StarterPlayer/StarterPlayerScripts/DesktopUI",
       "class": "ModuleScript",
-      "sha256": "b6cae25d284246b373f4133434ad2d08f36d346ae2a57137a65d270e6cf18ab1"
+      "sha256": "4c23e13a0d9cb68576120c3182b0cc82720cc72f8d0158ced306fee5fb6006df"
     },
     {
       "source": "src/StarterPlayer/StarterPlayerScripts/IncomeSlotUI.client.lua",

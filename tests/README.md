@@ -1,3 +1,5 @@
+Шаг 38, Studio Luau: studio_core_runner + core_progression (20), refinement (6); studio_spin_runner + batch_spins (8), regional_spins (9) — прошли на точных сервисах с контролируемым I/O, без реальных DataStore. Office_assignment — 6 уникальных назначений/освобождение/reuse/repeatJoin на клоне сцены. Client_automation_preview — временный модуль, 3 карточки, Count=3, MaxOutstanding=1, авто остановилось после ошибки; временный модуль удалён до сохранения. Настоящий Play: профиль/UI загружены без ошибок, NPCSeat занят NPC. Это не настоящая оплаченная пакетная выдача и не многоклиентский нагрузочный тест.
+
 # Проверки серверного назначения слотов
 
 Шаг 33: tests/equip_best.lua содержит 15 изолированных проверок, выполненных в Studio Luau с точным исходником сервиса и подменённым PlayerDataStore. Все прошли. Cooldown отменён пользователем; tests/income_slots.lua скорректирован под новое правило, но его локальный Lua 5.4 runner на этой Windows в этом шаге не запускался.

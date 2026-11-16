@@ -39,6 +39,12 @@ return function(Upgrades, Sales, Registry, Rules, IO)
 		for _,key in ipairs({"Storage","Luck","Speed","Slots","Auto"}) do for level=0,#Rules.Branches[key].Prices-1 do assert(Upgrades.Buy(s,key,level)) end end
 		assert(s.Data.Upgrades.Auto==1 and s.Data.Upgrades.Speed==8 and s.Data.Upgrades.Luck==10)
 	end)
+	test("batch upgrades cost 500k and 1m, ending at three", function()
+		local s=fixture();s.Data.Balance=2000000
+		assert(Upgrades.Buy(s,"Batch",0));assert(s.Data.Balance==1500000 and s.Data.Upgrades.Batch==1)
+		assert(Upgrades.Buy(s,"Batch",1));assert(s.Data.Balance==500000 and s.Data.Upgrades.Batch==2)
+		local r,c=Upgrades.Buy(s,"Batch",2);assert(not r and c=="MaxUpgrade")
+	end)
 	test("newcomer cannot spend their last draw on upgrades", function()
 		local s=fixture(); s.Data.Balance=3000; local r,c=Upgrades.Buy(s,"Storage",0)
 		assert(not r and c=="StarterReserve" and s.Data.Balance==3000 and not s.Writes)
