@@ -3,7 +3,7 @@ return function(Upgrades, Sales, Registry, Rules, IO)
 	local passed = {}
 	local function test(name, fn) IO.Reset(); fn(); table.insert(passed, name) end
 	local function fixture()
-		return {UserId = 123, LeaseUntil = os.time() + 1000, Data = {Balance = 1000000, InventoryCapacity = 25, IncomeSlotCount = 3, SlotRevision = 0, IncomeSlots = {}, Inventory = {}}}
+		return {UserId = 123, LeaseUntil = os.time() + 1000, Data = {Balance = 1000000, InventoryCapacity = 25, IncomeSlotCount = 3, SlotRevision = 0, IncomeSlots = {}, Inventory = {}, UpgradeTreeVersion=2, Upgrades={Storage=0,Slots=0,Luck=0,Speed=0,Auto=0}}}
 	end
 	local function item(s)
 		local full = "79031234567"
@@ -21,11 +21,11 @@ return function(Upgrades, Sales, Registry, Rules, IO)
 	end)
 	test("storage tiers use exact prices and stop at 200", function()
 		local s=fixture(); assert(Upgrades.Initialize(s))
-		for level,price in ipairs({10000,35000,75000,150000}) do local before=s.Data.Balance; assert(Upgrades.Buy(s,"Storage",level-1)); assert(before-s.Data.Balance==price) end
-		assert(s.Data.InventoryCapacity==200); local result,code=Upgrades.Buy(s,"Storage",4); assert(not result and code=="MaxUpgrade")
+		for level,price in ipairs(Rules.Branches.Storage.Prices) do local before=s.Data.Balance; assert(Upgrades.Buy(s,"Storage",level-1)); assert(before-s.Data.Balance==price) end
+		assert(s.Data.InventoryCapacity==200); local result,code=Upgrades.Buy(s,"Storage",9); assert(not result and code=="MaxUpgrade")
 	end)
 	test("slot tiers grow to five and invalidate old slot revision", function()
-		local s=fixture(); assert(Upgrades.Initialize(s)); assert(Upgrades.Buy(s,"Slots",0)); assert(s.Data.IncomeSlotCount==4 and s.Data.Balance==830000 and s.Data.SlotRevision==1)
+		local s=fixture(); s.Data.Upgrades.Storage=5;s.Data.Upgrades.Luck=4;s.Data.InventoryCapacity=100; assert(Upgrades.Initialize(s)); assert(Upgrades.Buy(s,"Slots",0)); assert(s.Data.IncomeSlotCount==4 and s.Data.Balance==830000 and s.Data.SlotRevision==1)
 		assert(Upgrades.Buy(s,"Slots",1)); assert(s.Data.IncomeSlotCount==5 and s.Data.SlotRevision==2 and s.Data.Balance==380000)
 	end)
 	test("duplicate purchase cannot buy next level", function()
@@ -36,23 +36,23 @@ return function(Upgrades, Sales, Registry, Rules, IO)
 	end)
 	test("all five branches reach their documented caps", function()
 		local s=fixture(); s.Data.Balance=10000000
-		for _,key in ipairs(Rules.Order) do for level=0,#Rules.Branches[key].Prices-1 do assert(Upgrades.Buy(s,key,level)) end end
-		assert(s.Data.Upgrades.Auto==1 and s.Data.Upgrades.Speed==4 and s.Data.Upgrades.Luck==5)
+		for _,key in ipairs({"Storage","Luck","Speed","Slots","Auto"}) do for level=0,#Rules.Branches[key].Prices-1 do assert(Upgrades.Buy(s,key,level)) end end
+		assert(s.Data.Upgrades.Auto==1 and s.Data.Upgrades.Speed==8 and s.Data.Upgrades.Luck==10)
 	end)
 	test("newcomer cannot spend their last draw on upgrades", function()
-		local s=fixture(); s.Data.Balance=10000; local r,c=Upgrades.Buy(s,"Storage",0)
-		assert(not r and c=="StarterReserve" and s.Data.Balance==10000 and not s.Writes)
-		s.Data.Balance=15000; assert(Upgrades.Buy(s,"Storage",0)); assert(s.Data.Balance==5000)
+		local s=fixture(); s.Data.Balance=3000; local r,c=Upgrades.Buy(s,"Storage",0)
+		assert(not r and c=="StarterReserve" and s.Data.Balance==3000 and not s.Writes)
+		s.Data.Balance=8000; assert(Upgrades.Buy(s,"Storage",0)); assert(s.Data.Balance==5000)
 	end)
 	test("luck adjusts weights and normalizes without a regional guarantee", function()
 		local base={6000000,3000000,880000,110000,9900,100}
-		local w,total=Rules.Weights(base,5); assert(w[1]==600000000 and w[6]==11500 and total==1060000000)
+		local w,total=Rules.Weights(base,10); assert(w[1]==1200000000 and w[6]==23000 and total==2120000000)
 		local sum=0; for _,v in ipairs(w) do sum+=v/total end; assert(math.abs(sum-1)<1e-12)
 		local plain,t=Rules.Weights(base,0); assert(plain[1]/t==0.6 and base[1]==6000000)
-		assert(Rules.Duration(6,4)==5 and Rules.Duration(6,0)==6)
+		assert(Rules.Duration(6,8)==5 and Rules.Duration(6,0)==6)
 	end)
 	test("purchase write uncertainty requires recovery and preserves transaction snapshot", function()
-		local s=fixture(); IO.ProfileFailAt=1; local r,c=Upgrades.Buy(s,"Auto",0); assert(not r and c=="RecoveryRequired" and s.NeedsRecovery and s.Data.Balance==975000 and s.Data.Upgrades.Auto==1)
+		local s=fixture();s.Data.Upgrades.Speed=2; IO.ProfileFailAt=1; local r,c=Upgrades.Buy(s,"Auto",0); assert(not r and c=="RecoveryRequired" and s.NeedsRecovery and s.Data.Balance==975000 and s.Data.Upgrades.Auto==1)
 		assert(not Upgrades.Buy(s,"Storage",0))
 	end)
 	test("busy and expired sessions reject purchases and sale", function()

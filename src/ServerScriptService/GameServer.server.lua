@@ -13,6 +13,7 @@ local slotResult = remotes:WaitForChild("SlotResult")
 local UpgradeRules = require(ReplicatedStorage:WaitForChild("UpgradeConfig"))
 local UpgradeService = require(script.Parent:WaitForChild("UpgradeService"))
 local SaleService = require(script.Parent:WaitForChild("SaleService"))
+local NumberEconomy = require(script.Parent:WaitForChild("NumberEconomy"))
 local function remote(name)
 	local value = remotes:FindFirstChild(name)
 	if not value then value = Instance.new("RemoteEvent"); value.Name = name; value.Parent = remotes end
@@ -139,6 +140,11 @@ local function setupPlayer(player)
 		stopSession(player, "Не удалось восстановить операции профиля. Переподключитесь позже."); return
 	end
 	local slots, slotError, slotDetails = IncomeSlotService.Initialize(session)
+	local incomeUpdated = pcall(NumberEconomy.RefreshIncome, session.Data)
+	if not incomeUpdated or not PlayerDataStore.Save(session, false) then
+		stopSession(player, "Не удалось обновить расчёт дохода. Переподключитесь позже."); return
+	end
+	slots, slotError, slotDetails = IncomeSlotService.Initialize(session)
 	if not slots then
 		warn("NUMBER RUSH: проверка слотов: " .. tostring(slotDetails or slotError))
 		stopSession(player, "Не удалось проверить доходные слоты. Подключитесь немного позже.")
@@ -316,6 +322,7 @@ slotRequest.OnServerEvent:Connect(function(player, action, index, issuanceId, re
 end)
 
 local progressMessages = {
+	UpgradeLocked = "Сначала откройте связанные улучшения, указанные в дереве.",
 	StarterReserve = "Сначала получите номер: нужно оставить 5 000 ₽ на первую выдачу.",
 	NotEnoughMoney = "Недостаточно рублей.", StaleUpgrade = "Уровень уже изменился. Проверьте следующую ступень.",
 	MaxUpgrade = "Достигнут максимальный уровень.", InvalidUpgrade = "Выберите доступное улучшение.",

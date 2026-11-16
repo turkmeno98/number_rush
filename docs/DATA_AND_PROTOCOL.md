@@ -1,5 +1,7 @@
 # Сохранения и сетевой протокол
 
+Шаг 36: UpgradeTreeVersion=2, IncomeFormulaVersion=2; схема DataStore прежняя. Перенос эффектов старых уровней и пересчёт дохода коллекции сохраняются перед DataReady. ProgressRequest/SpinRequest не изменены; новая ошибка UpgradeLocked. См. REFINEMENT_V2.md.
+
 ## Шаг 35 — прокачка и продажа
 
 Добавлены ProgressRequest (клиент → сервер: action Buy/Sell, branch/issuanceId, expectedLevel для Buy) и ProgressResult (Status, ErrorCode?/Message?, Action?, Levels?/Branch?/Paid? либо IssuanceId/Amount). Цена, владение и уровни серверные. Повтор Buy с прежним уровнем не покупает следующий.

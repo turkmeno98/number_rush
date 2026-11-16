@@ -3,6 +3,15 @@ local Store = require(script.Parent:WaitForChild("PlayerDataStore"))
 local Service = {}
 function Service.Initialize(session)
 	local data = session.Data
+	if data.UpgradeTreeVersion ~= nil and data.UpgradeTreeVersion ~= 2 then return nil, "RecoveryRequired" end
+	if data.Upgrades and data.UpgradeTreeVersion == nil then
+		local old = data.Upgrades
+		local storageMap = {[0]=0,2,5,7,9}
+		if type(old) ~= "table" or type(old.Storage) ~= "number" or not storageMap[old.Storage]
+			or type(old.Luck) ~= "number" or old.Luck % 1 ~= 0 or old.Luck < 0 or old.Luck > 5
+			or type(old.Speed) ~= "number" or old.Speed % 1 ~= 0 or old.Speed < 0 or old.Speed > 4 then return nil, "RecoveryRequired" end
+		data.Upgrades = {Storage=storageMap[old.Storage], Slots=old.Slots, Luck=old.Luck*2, Speed=old.Speed*2, Auto=old.Auto}
+	end
 	if data.Upgrades == nil then
 		local levels = {Luck = 0, Speed = 0, Auto = 0}
 		for _, key in ipairs({"Storage", "Slots"}) do
@@ -19,6 +28,7 @@ function Service.Initialize(session)
 	end
 	if Rules.Branches.Storage.Values[data.Upgrades.Storage + 1] ~= data.InventoryCapacity
 		or Rules.Branches.Slots.Values[data.Upgrades.Slots + 1] ~= data.IncomeSlotCount then return nil, "RecoveryRequired" end
+	data.UpgradeTreeVersion = 2
 	return {Status = "Ready", Levels = table.clone(data.Upgrades)}
 end
 function Service.Buy(session, key, expectedLevel)
@@ -35,6 +45,7 @@ function Service.Buy(session, key, expectedLevel)
 		if level ~= expectedLevel then return nil, "StaleUpgrade" end
 		local price = branch.Prices[level + 1]
 		if not price then return nil, "MaxUpgrade" end
+		if Rules.Requirement(data.Upgrades, key) then return nil, "UpgradeLocked" end
 		if data.Balance < price then return nil, "NotEnoughMoney" end
 		-- A newcomer without any number must retain one ordinary regional draw.
 		if next(data.Inventory) == nil and data.Balance - price < 5000 then return nil, "StarterReserve" end
