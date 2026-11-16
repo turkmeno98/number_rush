@@ -87,8 +87,8 @@ local function run(session, callback)
 	if not available(session) then return nil, "SessionUnavailable" end
 	if session.NeedsRecovery then return nil, "RecoveryRequired" end
 	if type(session.Data) ~= "table" then return nil, "RecoveryRequired", "MissingProfileData" end
-	if session.SlotBusy or session.SpinBusy or session.RequestBusy or session.Busy
-		or session.Data.PendingSpin then return nil, "Busy" end
+	if session.SlotBusy or session.SpinBusy or session.RequestBusy or session.Busy or session.ProgressBusy
+		or session.Data.PendingSpin or session.Data.PendingSale then return nil, "Busy" end
 	session.SlotBusy = true
 	local ok, result, code, details = pcall(function()
 		local valid, reason = validateBook(session.Data)

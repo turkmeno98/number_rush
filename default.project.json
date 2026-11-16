@@ -24,6 +24,12 @@
         },
         "SlotResult": {
           "$className": "RemoteEvent"
+        },
+        "ProgressRequest": {
+          "$className": "RemoteEvent"
+        },
+        "ProgressResult": {
+          "$className": "RemoteEvent"
         }
       },
       "NewsConfig": {
@@ -31,6 +37,9 @@
       },
       "RegionCatalog": {
         "$path": "src/ReplicatedStorage/RegionCatalog.lua"
+      },
+      "UpgradeConfig": {
+        "$path": "src/ReplicatedStorage/UpgradeConfig.lua"
       }
     },
     "ServerScriptService": {

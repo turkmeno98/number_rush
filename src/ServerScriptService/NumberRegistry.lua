@@ -76,4 +76,19 @@ function NumberRegistry.Cancel(fullNumber, userId, operationId)
 	end)
 end
 
+-- Generation advancing proves the old issuance was released; never free a newer owner.
+function NumberRegistry.ReleaseOwned(fullNumber, userId, issuanceId, generation)
+	validateArguments(fullNumber, userId, issuanceId)
+	assert(type(generation) == "number" and generation % 1 == 0 and generation >= 1, "Invalid generation")
+	return updateRecord(fullNumber, function(record)
+		if not record then return nil, "MissingIssuance" end
+		if record.Generation > generation then return record end
+		if record.Generation ~= generation or record.IssuanceId ~= issuanceId then return nil, "IssuanceMismatch" end
+		if record.State == "Free" and record.LastOwnerId == userId then return record end
+		if record.State ~= "Owned" or record.OwnerId ~= userId then return nil, "OwnerMismatch" end
+		record.State = "Free"; record.LastOwnerId = userId; record.OwnerId = nil; record.UpdatedAt = os.time()
+		return record
+	end)
+end
+
 return NumberRegistry

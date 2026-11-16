@@ -43,18 +43,19 @@ local function getLegendaryNumbers()
 	return list
 end
 
-function NumberGenerator.RollRarity(profileId)
+function NumberGenerator.RollRarity(profileId, adjustedWeights)
 	local profile = Config.Profiles[profileId]
 	assert(profile, "Неизвестный профиль прокрутки")
 	local totalWeight = 0
-	for _, weight in profile.Weights do
+	local weights = adjustedWeights or profile.Weights
+	for _, weight in weights do
 		assert(type(weight) == "number" and weight >= 0 and weight % 1 == 0, "Вес категории должен быть целым неотрицательным числом")
 		totalWeight += weight
 	end
-	assert(totalWeight == 10000000, "Сумма весов профиля должна быть 10 миллионов")
+	assert(totalWeight > 0 and (adjustedWeights ~= nil or totalWeight == 10000000), "Некорректная сумма весов")
 	local roll = random:NextInteger(1, totalWeight)
 	local accumulated = 0
-	for rarityIndex, weight in profile.Weights do
+	for rarityIndex, weight in weights do
 		accumulated += weight
 		if roll <= accumulated then return rarityIndex end
 	end

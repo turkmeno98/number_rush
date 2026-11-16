@@ -66,7 +66,7 @@ def build():
         by_path[cls] = item(root, cls, cls)
     by_path['StarterPlayer/StarterPlayerScripts'] = item(by_path['StarterPlayer'], 'StarterPlayerScripts', 'StarterPlayerScripts')
     by_path['ReplicatedStorage/NumberRushRemotes'] = item(by_path['ReplicatedStorage'], 'Folder', 'NumberRushRemotes')
-    for name in ['SpinRequest','SpinResult','SlotRequest','SlotResult']:
+    for name in ['SpinRequest','SpinResult','SlotRequest','SlotResult','ProgressRequest','ProgressResult']:
         item(by_path['ReplicatedStorage/NumberRushRemotes'], 'RemoteEvent', name)
 
     entries = sources()
@@ -107,12 +107,12 @@ def build():
     ET.ElementTree(root).write(output, encoding='utf-8', xml_declaration=True)
 
     manifest = {
-        'checkpoint': '2026-11-15-step-34-regional-draws',
+        'checkpoint': '2026-11-16-step-35-core-progression',
         'provenance': 'Reconstructed from latest conversation code, not exported from user Studio',
         'original_rbxl_received': False,
         'generated_place': output.relative_to(ROOT).as_posix(),
         'sources': entries,
-        'remote_events': ['ReplicatedStorage/NumberRushRemotes/' + name for name in ['SpinRequest','SpinResult','SlotRequest','SlotResult']],
+        'remote_events': ['ReplicatedStorage/NumberRushRemotes/' + name for name in ['SpinRequest','SpinResult','SlotRequest','SlotResult','ProgressRequest','ProgressResult']],
         'excluded_disabled_scripts': ['DataStoreCheck','NumberRulesTest','BalanceSaveTest'],
     }
     (ROOT / 'snapshot_manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
@@ -127,7 +127,7 @@ def build():
         'Workspace':{'$className':'Workspace','$ignoreUnknownInstances':True},
         'ReplicatedStorage':{'$className':'ReplicatedStorage',
             'GameConfig':{'$path':'src/ReplicatedStorage/GameConfig.lua'},
-            'NumberRushRemotes':{'$className':'Folder','SpinRequest':{'$className':'RemoteEvent'},'SpinResult':{'$className':'RemoteEvent'},'SlotRequest':{'$className':'RemoteEvent'},'SlotResult':{'$className':'RemoteEvent'}}},
+            'NumberRushRemotes':{'$className':'Folder','SpinRequest':{'$className':'RemoteEvent'},'SpinResult':{'$className':'RemoteEvent'},'SlotRequest':{'$className':'RemoteEvent'},'SlotResult':{'$className':'RemoteEvent'},'ProgressRequest':{'$className':'RemoteEvent'},'ProgressResult':{'$className':'RemoteEvent'}}},
         'ServerScriptService':{'$className':'ServerScriptService','$path':'src/ServerScriptService'},
         'StarterPlayer':{'$className':'StarterPlayer','StarterPlayerScripts':client_tree},
     }}

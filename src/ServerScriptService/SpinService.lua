@@ -6,6 +6,7 @@ local NumberGenerator = require(script.Parent:WaitForChild("NumberGenerator"))
 local NumberEconomy = require(script.Parent:WaitForChild("NumberEconomy"))
 local NumberRegistry = require(script.Parent:WaitForChild("NumberRegistry"))
 local SpinService = {}
+local Upgrades = require(ReplicatedStorage:WaitForChild("UpgradeConfig"))
 local MAX_CANDIDATES = 8
 local random = Random.new()
 
@@ -148,6 +149,7 @@ function SpinService.Recover(session)
 end
 
 function SpinService.Start(session, operatorId, regionId, sequence)
+	if session.ProgressBusy or session.Data.PendingSale then return nil, "Busy" end
 	return runExclusive(session, function()
 		local data = session.Data
 		if type(operatorId) ~= "string" or type(regionId) ~= "string" then return nil, "InvalidRegion" end
@@ -166,7 +168,8 @@ function SpinService.Start(session, operatorId, regionId, sequence)
 		for _ in pairs(data.Inventory) do count += 1 end
 		if count >= data.InventoryCapacity then return nil, "InventoryFull" end
 		local startedAt = DateTime.now().UnixTimestampMillis
-		local rarityIndex = NumberGenerator.RollRarity("Regional")
+		local weights = Upgrades.Weights(Config.Profiles.Regional.Weights, Upgrades.Level(data, "Luck"))
+		local rarityIndex = NumberGenerator.RollRarity("Regional", weights)
 		local code = offer.Codes[random:NextInteger(1, #offer.Codes)]
 		local draft, draftError = makeDraft(code, rarityIndex, {ProfileId = "Regional", OperatorId = offer.OperatorId,
 			OperatorName = offer.OperatorName, Region = offer.Region, RegionId = offer.Id, OfferPrice = offer.Price})
@@ -175,7 +178,7 @@ function SpinService.Start(session, operatorId, regionId, sequence)
 		local pending = {
 			OperationId = HttpService:GenerateGUID(false), Sequence = sequence,
 			Price = offer.Price, Attempt = 1, Draft = draft,
-			NotBeforeMillis = startedAt + Config.SpinDuration * 1000,
+			NotBeforeMillis = startedAt + math.ceil(Upgrades.Duration(Config.SpinDuration, Upgrades.Level(data, "Speed")) * 1000),
 		}
 		data.PendingSpin = pending
 		data.NextSpinSequence = sequence + 1

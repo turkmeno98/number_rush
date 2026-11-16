@@ -1,5 +1,15 @@
 # Сохранения и сетевой протокол
 
+## Шаг 35 — прокачка и продажа
+
+Добавлены ProgressRequest (клиент → сервер: action Buy/Sell, branch/issuanceId, expectedLevel для Buy) и ProgressResult (Status, ErrorCode?/Message?, Action?, Levels?/Branch?/Paid? либо IssuanceId/Amount). Цена, владение и уровни серверные. Повтор Buy с прежним уровнем не покупает следующий.
+
+Data.Upgrades = {Storage, Slots, Luck, Speed, Auto}, целые последовательные уровни. Старый профиль без поля получает уровни Storage/Slots по существующим лимитам, остальные нули, без сброса. Некорректные/несогласованные поля отклоняются. Репликация: UpgradeStorage/Slots/Luck/Speed/Auto и прежние лимиты. SpinService применяет личные веса/время.
+
+Data.PendingSale = {IssuanceId, FullNumber, Generation, Amount} — уже сохранённые начисление и удаление, ожидающее завершения освобождение реестра. LastSale — квитанция без повторной выплаты. ReleaseOwned освобождает только совпадающий Owned-выпуск/владельца/поколение; повтор Free того же выпуска успешен. Большее поколение доказывает уже завершённое освобождение старого выпуска; новый владелец не меняется. Неизвестный исход не откатываем. Recover после PendingSpin и до DataReady. См. CORE_RELEASE.md.
+
+ProgressBusy — только сессионный флаг. DataStore имена/ключи/SchemaVersion прежние. Старые утверждения об отсутствии продажи Owned ниже исторические.
+
 ## Дополнение шага 34 — выдача по региону
 
 SpinRequest = operatorId:string, regionId:string, sequence:integer. Старый пакет code/sequence отклоняется без оплаты. Started содержит OperatorId/RegionId/Duration; код определяется только сервером. Предмет v3 хранит EconomyVersion=3, RegionId и OfferPrice; для оценки применяется Regional с престижем 1. Цена и регион фиксируются в PendingSpin. Повтор кандидата использует сохранённый контекст, возврат — PendingSpin.Price. Legacy PendingSpin без EconomyVersion продолжает восстанавливаться через прежний CodeOffers; старые предметы не переписываются. SchemaVersion и имена/ключи DataStore прежние. Ниже старые описания выбора кода относятся к исторической версии.

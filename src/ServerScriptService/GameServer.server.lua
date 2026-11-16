@@ -10,6 +10,20 @@ local spinRequest = remotes:WaitForChild("SpinRequest")
 local spinResult = remotes:WaitForChild("SpinResult")
 local slotRequest = remotes:WaitForChild("SlotRequest")
 local slotResult = remotes:WaitForChild("SlotResult")
+local UpgradeRules = require(ReplicatedStorage:WaitForChild("UpgradeConfig"))
+local UpgradeService = require(script.Parent:WaitForChild("UpgradeService"))
+local SaleService = require(script.Parent:WaitForChild("SaleService"))
+local function remote(name)
+	local value = remotes:FindFirstChild(name)
+	if not value then value = Instance.new("RemoteEvent"); value.Name = name; value.Parent = remotes end
+	return value
+end
+local progressRequest, progressResult = remote("ProgressRequest"), remote("ProgressResult")
+local function publishProgress(player, session)
+	player:SetAttribute("InventoryCapacity", session.Data.InventoryCapacity)
+	player:SetAttribute("IncomeSlotCount", session.Data.IncomeSlotCount)
+	for key, level in pairs(session.Data.Upgrades) do player:SetAttribute("Upgrade" .. key, level) end
+end
 local sessions, loading = {}, {}
 local shuttingDown = false
 
@@ -65,11 +79,11 @@ local function closeProfile(player)
 	player:SetAttribute("DataReady", false)
 	if session.BalanceConnection then session.BalanceConnection:Disconnect() end
 	local deadline = os.clock() + 20
-	while session.Busy and os.clock() < deadline do task.wait(0.1) end
+	while (session.Busy or session.SpinBusy or session.RequestBusy or session.SlotBusy or session.ProgressBusy) and os.clock() < deadline do task.wait(0.1) end
 	local saved, saveError = false, "Не удалось завершить сохранение"
 	for attempt = 1, 3 do
 		if os.clock() >= deadline then break end
-		if not session.Busy then
+		if not session.Busy and not session.SpinBusy and not session.RequestBusy and not session.SlotBusy and not session.ProgressBusy then
 			saved, saveError = PlayerDataStore.Save(session, true)
 			if saved then break end
 		end
@@ -119,6 +133,11 @@ local function setupPlayer(player)
 		return
 	end
 	if player.Parent ~= Players or shuttingDown then closeProfile(player); return end
+	local saleRecovered = SaleService.Recover(session)
+	local upgradesReady = saleRecovered and UpgradeService.Initialize(session)
+	if not saleRecovered or not upgradesReady then
+		stopSession(player, "Не удалось восстановить операции профиля. Переподключитесь позже."); return
+	end
 	local slots, slotError, slotDetails = IncomeSlotService.Initialize(session)
 	if not slots then
 		warn("NUMBER RUSH: проверка слотов: " .. tostring(slotDetails or slotError))
@@ -152,6 +171,7 @@ local function setupPlayer(player)
 	end
 	slots.State.IncomeEnabled = true
 	publishInventory(player, session)
+	publishProgress(player, session)
 	publishSlots(player, slots.State)
 	leaderstats.Parent = player
 	player:SetAttribute("DataReady", true)
@@ -185,7 +205,7 @@ spinRequest.OnServerEvent:Connect(function(player, operatorId, regionId, sequenc
 	local now = os.clock()
 	if session.LastRequestAt and now - session.LastRequestAt < 0.25 then return end
 	session.LastRequestAt = now
-	if session.RequestBusy or session.SpinBusy or session.SlotBusy then sendError(player, session, nil, "Busy"); return end
+	if session.RequestBusy or session.SpinBusy or session.SlotBusy or session.ProgressBusy then sendError(player, session, nil, "Busy"); return end
 	if type(operatorId) ~= "string" or type(regionId) ~= "string" then sendError(player, session, nil, "InvalidRegion"); return end
 	local offer = Config.ResolveRegion(operatorId, regionId)
 	if not offer then sendError(player, session, nil, "InvalidRegion"); return end
@@ -200,7 +220,7 @@ spinRequest.OnServerEvent:Connect(function(player, operatorId, regionId, sequenc
 		if count >= session.Data.InventoryCapacity then sendError(player, session, sequence, "InventoryFull"); return end
 	end
 	session.RequestBusy = true
-	if not repeated then send(player, {Status = "Started", Sequence = sequence, OperatorId = operatorId, RegionId = regionId, Duration = Config.SpinDuration}) end
+	if not repeated then send(player, {Status = "Started", Sequence = sequence, OperatorId = operatorId, RegionId = regionId, Duration = UpgradeRules.Duration(Config.SpinDuration, UpgradeRules.Level(session.Data, "Speed"))}) end
 	local receipt, errorCode, details = SpinService.Start(session, operatorId, regionId, sequence)
 	session.RequestBusy = false
 	if not receipt then
@@ -295,6 +315,38 @@ slotRequest.OnServerEvent:Connect(function(player, action, index, issuanceId, re
 	slotResult:FireClient(player, result)
 end)
 
+local progressMessages = {
+	StarterReserve = "Сначала получите номер: нужно оставить 5 000 ₽ на первую выдачу.",
+	NotEnoughMoney = "Недостаточно рублей.", StaleUpgrade = "Уровень уже изменился. Проверьте следующую ступень.",
+	MaxUpgrade = "Достигнут максимальный уровень.", InvalidUpgrade = "Выберите доступное улучшение.",
+	Busy = "Дождитесь завершения текущего действия.", ItemNotOwned = "Номера больше нет в коллекции.",
+	ItemInstalled = "Сначала снимите номер с доходного слота или замените его.",
+	BalanceLimit = "Достигнут предел баланса.", SessionUnavailable = "Профиль ещё не готов.",
+}
+progressRequest.OnServerEvent:Connect(function(player, action, key, expectedLevel)
+	local session = sessions[player]
+	if not session or player:GetAttribute("DataReady") ~= true then return end
+	if session.LastProgressRequestAt and os.clock() - session.LastProgressRequestAt < 0.3 then
+		progressResult:FireClient(player, {Status = "Error", Message = progressMessages.Busy}); return
+	end
+	session.LastProgressRequestAt = os.clock()
+	local result, code
+	if action == "Buy" then result, code = UpgradeService.Buy(session, key, expectedLevel)
+	elseif action == "Sell" then result, code = SaleService.Sell(session, key)
+	else code = "InvalidAction" end
+	if not result then
+		progressResult:FireClient(player, {Status = "Error", ErrorCode = code, Message = progressMessages[code] or "Операция не выполнена. Переподключитесь для проверки профиля."})
+		if code == "RecoveryRequired" then stopSession(player, "Проверяем сохранение операции. Переподключитесь позже.") end
+		return
+	end
+	if session.Closing or session.Closed or player.Parent ~= Players then return end
+	publishProgress(player, session); publishInventory(player, session)
+	local slots = IncomeSlotService.GetState(session)
+	if slots then publishSlots(player, slots.State); slotResult:FireClient(player, slots) end
+	result.Action = action
+	progressResult:FireClient(player, result)
+end)
+
 Players.PlayerRemoving:Connect(closeProfile)
 Players.PlayerAdded:Connect(setupPlayer)
 for _, player in Players:GetPlayers() do task.spawn(setupPlayer, player) end
@@ -304,7 +356,7 @@ task.spawn(function()
 		task.wait(1)
 		for player, session in pairs(sessions) do
 			if session.Closing or session.Closed or session.NeedsRecovery or session.Busy
-				or session.SpinBusy or session.RequestBusy or session.SlotBusy then continue end
+				or session.SpinBusy or session.RequestBusy or session.SlotBusy or session.ProgressBusy then continue end
 			local ok, reason = OnlineIncomeService.Accrue(session)
 			if not ok then
 				session.NeedsRecovery = true
@@ -324,11 +376,11 @@ task.spawn(function()
 				stopSession(player, "Связь с хранилищем потеряна. Подключитесь немного позже.")
 				continue
 			end
-			if session.SpinBusy or session.RequestBusy or session.SlotBusy then continue end
+			if session.SpinBusy or session.RequestBusy or session.SlotBusy or session.ProgressBusy then continue end
 			if os.clock() >= session.NextSaveAt and not session.Busy then
 				session.NextSaveAt = os.clock() + 30
 				task.spawn(function()
-					if session.Closing or session.Closed or session.SpinBusy or session.RequestBusy or session.SlotBusy then return end
+					if session.Closing or session.Closed or session.SpinBusy or session.RequestBusy or session.SlotBusy or session.ProgressBusy then return end
 					local saved, saveError = PlayerDataStore.Save(session, false)
 					if not saved then warn("NUMBER RUSH: ошибка автосохранения: " .. tostring(saveError)) end
 				end)

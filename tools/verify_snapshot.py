@@ -21,7 +21,7 @@ def walk(parent,prefix=''):
         instances[path]=item
         walk(item,path)
 walk(tree.getroot())
-assert len(manifest['sources'])==16
+assert len(manifest['sources'])==19
 for entry in manifest['sources']:
     file=ROOT/entry['source']
     assert hashlib.sha256(file.read_bytes()).hexdigest()==entry['sha256'],file
@@ -31,7 +31,7 @@ for entry in manifest['sources']:
     assert source==file.read_text(),entry
 for path in manifest['remote_events']:
     assert instances[path].get('class')=='RemoteEvent'
-assert len(manifest['remote_events'])==4
+assert len(manifest['remote_events'])==6
 assert 'ReplicatedStorage/NumberRushRemotes/SlotRequest' in instances
 assert 'ReplicatedStorage/NumberRushRemotes/SlotResult' in instances
 for name in manifest['excluded_disabled_scripts']:
@@ -81,5 +81,5 @@ assert 'Balance =' not in slots and 'Balance +=' not in slots
 assert (ROOT/'docs/HANDOFF.md').is_file()
 assert (ROOT/'docs/BALANCE_V02.md').is_file()
 assert (ROOT/'AGENTS.md').is_file()
-print('PASS: 16 source hashes and XML Source roundtrips; regional catalog, news and desktop UI included; 4 RemoteEvents; disabled probes excluded; 12 legacy codes; 4 weight totals; checkpoint documents.')
+print('PASS: 19 source hashes and XML Source roundtrips; regional catalog, news and desktop UI included; 6 RemoteEvents; disabled probes excluded; 12 legacy codes; 4 weight totals; checkpoint documents.')
 print('Not executed: Luau runtime, Studio import, DataStore operations, multiplayer fault cases.')
