@@ -1,6 +1,6 @@
 {
-  "checkpoint": "2026-11-15-after-step-28-slot-server-prepared",
-  "provenance": "Reconstructed from latest conversation code, not exported from user Studio",
+  "checkpoint": "2026-11-21-step-38-with-studio-trading-foundation",
+  "provenance": "Reconstructed from repository sources verified against Studio; includes nine Studio trading modules, without original scene geometry",
   "original_rbxl_received": false,
   "generated_place": "places/NUMBER_RUSH_reconstructed.rbxlx",
   "sources": [
@@ -8,37 +8,109 @@
       "source": "src/ReplicatedStorage/GameConfig.lua",
       "studio_path": "ReplicatedStorage/GameConfig",
       "class": "ModuleScript",
-      "sha256": "1b2195a43db243adbe7f4d5d5b6c7ae606bc0eb5e8930e5e19970e1df8c44e2e"
+      "sha256": "d3987b25d2b479ee622cd4689889dac40324a69a80e2c2974b512960d7070ee2"
+    },
+    {
+      "source": "src/ReplicatedStorage/NewsConfig.lua",
+      "studio_path": "ReplicatedStorage/NewsConfig",
+      "class": "ModuleScript",
+      "sha256": "ea5efa926e3683d6c430e6ab0828d6da92217b18430d8c6a855fac0d19e20a13"
+    },
+    {
+      "source": "src/ReplicatedStorage/RegionCatalog.lua",
+      "studio_path": "ReplicatedStorage/RegionCatalog",
+      "class": "ModuleScript",
+      "sha256": "8e7df64f274dc8da620b110dcad414c5320be73d41db53c24c4e2690811b9a86"
+    },
+    {
+      "source": "src/ReplicatedStorage/UpgradeConfig.lua",
+      "studio_path": "ReplicatedStorage/UpgradeConfig",
+      "class": "ModuleScript",
+      "sha256": "0d56fa085c3cbf98f5c9e7a90a79b2cc1d96f65845996765ebc3a3ec3a97c265"
     },
     {
       "source": "src/ServerScriptService/GameServer.server.lua",
       "studio_path": "ServerScriptService/GameServer",
       "class": "Script",
-      "sha256": "9322ec1a02f285facfdf1515ac174e9471fe72cef1f3ae2a2ef0325c7c1e38cc"
+      "sha256": "b83b644282c867cad80bcb5138401a7e5c4f00197f5b79ab270a4ee343318e3f"
     },
     {
       "source": "src/ServerScriptService/IncomeSlotService.lua",
       "studio_path": "ServerScriptService/IncomeSlotService",
       "class": "ModuleScript",
-      "sha256": "525719c2a1a2595d29aca152009696b520dece448e44cf8467bfc1b1f207b696"
+      "sha256": "61c28a1b1ba13b75fed688105c54bef22cce082b14637f03101ca34988f47989"
+    },
+    {
+      "source": "src/ServerScriptService/NR_TradingFoundation/InventoryGuard.lua",
+      "studio_path": "ServerScriptService/NR_TradingFoundation/InventoryGuard",
+      "class": "ModuleScript",
+      "sha256": "409add378bc192e3e7698367edf685a2cb941929cd8579141702d06a2e0108cb"
+    },
+    {
+      "source": "src/ServerScriptService/NR_TradingFoundation/ListingCoordinator.lua",
+      "studio_path": "ServerScriptService/NR_TradingFoundation/ListingCoordinator",
+      "class": "ModuleScript",
+      "sha256": "67643c200a68f1e1f0b5c5761190dfabf04ee67a2c878d403f2a8ed1d2382216"
+    },
+    {
+      "source": "src/ServerScriptService/NR_TradingFoundation/ListingDraftService.lua",
+      "studio_path": "ServerScriptService/NR_TradingFoundation/ListingDraftService",
+      "class": "ModuleScript",
+      "sha256": "9533c26c57e711e2a0d932bd36a4205783a3f5f0fd42af961dde1941ddfcb51e"
+    },
+    {
+      "source": "src/ServerScriptService/NR_TradingFoundation/ListingRecordStore.lua",
+      "studio_path": "ServerScriptService/NR_TradingFoundation/ListingRecordStore",
+      "class": "ModuleScript",
+      "sha256": "f5aa39f4d84ba2798cb89d0f5f54ecbfeed47451704cc5cb6bae4accacce6309"
+    },
+    {
+      "source": "src/ServerScriptService/NR_TradingFoundation/MarketConfig.lua",
+      "studio_path": "ServerScriptService/NR_TradingFoundation/MarketConfig",
+      "class": "ModuleScript",
+      "sha256": "177dd7890d12c5c9e5fdde61a08875c60724a20cb0b2d63c0c1b74111a26d66d"
+    },
+    {
+      "source": "src/ServerScriptService/NR_TradingFoundation/PersistentListingClaim.lua",
+      "studio_path": "ServerScriptService/NR_TradingFoundation/PersistentListingClaim",
+      "class": "ModuleScript",
+      "sha256": "d0e1c9c108f9b3ac68de3340a6dadb55a4b2f246a3a3dce1a8c80541ebfe00a8"
+    },
+    {
+      "source": "src/ServerScriptService/NR_TradingFoundation/ReservationService.lua",
+      "studio_path": "ServerScriptService/NR_TradingFoundation/ReservationService",
+      "class": "ModuleScript",
+      "sha256": "54400d964b61d2e7cb35a4460161d68f74a3e6e1a38b9ac7454343c0bf924c8d"
+    },
+    {
+      "source": "src/ServerScriptService/NR_TradingFoundation/TradeEligibilityService.lua",
+      "studio_path": "ServerScriptService/NR_TradingFoundation/TradeEligibilityService",
+      "class": "ModuleScript",
+      "sha256": "b5043381707abc8027e093629dc3622f68313fd98d1dacda98f83fdd40b4e0c9"
+    },
+    {
+      "source": "src/ServerScriptService/NR_TradingFoundation/TransactionJournal.lua",
+      "studio_path": "ServerScriptService/NR_TradingFoundation/TransactionJournal",
+      "class": "ModuleScript",
+      "sha256": "c2b85b5abd14e2b9b2acf945f85bf30ad68bc4ee5e8d53d58af75b7088edec9a"
     },
     {
       "source": "src/ServerScriptService/NumberEconomy.lua",
       "studio_path": "ServerScriptService/NumberEconomy",
       "class": "ModuleScript",
-      "sha256": "4a1349e11c266185f835fa09c28e7ea55554b6fd3a44ea5e5dea48a9bf1b7508"
+      "sha256": "f542ac14d823e3ae82f3e133b7b4b2a10681209e84fbb1029d737c021cb6d520"
     },
     {
       "source": "src/ServerScriptService/NumberGenerator.lua",
       "studio_path": "ServerScriptService/NumberGenerator",
       "class": "ModuleScript",
-      "sha256": "36e7df06c50acf1cca98395e1d9b247e91650b7fe1803ad3d06052fd0c332455"
+      "sha256": "1a12c8576ffb2a51b6259549f325ac1c5066473cc86652317cde650980dee3bc"
     },
     {
       "source": "src/ServerScriptService/NumberRegistry.lua",
       "studio_path": "ServerScriptService/NumberRegistry",
       "class": "ModuleScript",
-      "sha256": "e8e1628533f9c885634b3cb07c8190c441d0fb083776a912fe2c38e8ed5c6d57"
+      "sha256": "c7ef8c05be1a4150ad0123da2a6cf3ed484e98a08904c173d39cafe5a3aa0d1a"
     },
     {
       "source": "src/ServerScriptService/NumberRules.lua",
@@ -47,35 +119,79 @@
       "sha256": "1b4de1cc73f1c431af490dcac0f7eae18cc6f56e8dba9a9efd63e5e45699014f"
     },
     {
+      "source": "src/ServerScriptService/OfficeScene.lua",
+      "studio_path": "ServerScriptService/OfficeScene",
+      "class": "ModuleScript",
+      "sha256": "f5c91e7beec6fd550ba94d5678fd2b6ff33b6285259deba5518916801294a8ea"
+    },
+    {
+      "source": "src/ServerScriptService/OfficeService.server.lua",
+      "studio_path": "ServerScriptService/OfficeService",
+      "class": "Script",
+      "sha256": "08152431959816d395f1c47593578c4a2271bbc9696a9d6e6b66c8804b1daee7"
+    },
+    {
+      "source": "src/ServerScriptService/OnlineIncomeService.lua",
+      "studio_path": "ServerScriptService/OnlineIncomeService",
+      "class": "ModuleScript",
+      "sha256": "7f1968d03874586a2a5e9dbc6e3c625ed48d8e0feb0d3c76dc3bb5e34141db9e"
+    },
+    {
       "source": "src/ServerScriptService/PlayerDataStore.lua",
       "studio_path": "ServerScriptService/PlayerDataStore",
       "class": "ModuleScript",
-      "sha256": "1dda52cc712edd7815525e636e1a72b865a3a57eb84ddf1fb6154f2ea1c60528"
+      "sha256": "85e761d3802dc79b8ddd10b0f7394cbceb1ee639504940d7afcd69ceeafe4c0d"
+    },
+    {
+      "source": "src/ServerScriptService/SaleService.lua",
+      "studio_path": "ServerScriptService/SaleService",
+      "class": "ModuleScript",
+      "sha256": "68448e24d91dd1852aef7cdc3c933fef9ade9c48bc099cebd7b5dad3acfbbc3d"
     },
     {
       "source": "src/ServerScriptService/SpinService.lua",
       "studio_path": "ServerScriptService/SpinService",
       "class": "ModuleScript",
-      "sha256": "a9f39b511eb4a25452944329a965bfb7c58455baa12e6a50ee662ebee3879673"
+      "sha256": "da290263f6c2ff78d72684f1c7b558a7762e93034fd93f9c6fb32664415be86e"
+    },
+    {
+      "source": "src/ServerScriptService/UpgradeService.lua",
+      "studio_path": "ServerScriptService/UpgradeService",
+      "class": "ModuleScript",
+      "sha256": "1c599ac6056b0a60e317671e02caf75ea811ba7759a8bdd1af1e209435872d0f"
     },
     {
       "source": "src/StarterPlayer/StarterPlayerScripts/CollectionUI.client.lua",
       "studio_path": "StarterPlayer/StarterPlayerScripts/CollectionUI",
       "class": "LocalScript",
-      "sha256": "90ade5351dd0f8ccb7970a59a713759f76d4309dfb188bf6d294b6917fe3900c"
+      "sha256": "d124e99fc9e379a18457e4bbb42d782b9b4d7658573390d287fd2e019b9763c4"
+    },
+    {
+      "source": "src/StarterPlayer/StarterPlayerScripts/DesktopUI.lua",
+      "studio_path": "StarterPlayer/StarterPlayerScripts/DesktopUI",
+      "class": "ModuleScript",
+      "sha256": "b2a547ffe3aebc12ba8770179ad8987696c3a9eca91a9a46d6a3aeb6c934ebb9"
+    },
+    {
+      "source": "src/StarterPlayer/StarterPlayerScripts/IncomeSlotUI.client.lua",
+      "studio_path": "StarterPlayer/StarterPlayerScripts/IncomeSlotUI",
+      "class": "LocalScript",
+      "sha256": "77d1e436612bec25488851ea0092073aca900b8ebfde9f22e02ae8006731db3a"
     },
     {
       "source": "src/StarterPlayer/StarterPlayerScripts/NumberRushUI.client.lua",
       "studio_path": "StarterPlayer/StarterPlayerScripts/NumberRushUI",
       "class": "LocalScript",
-      "sha256": "868133cdbe2ebdd4206069c2e78047ab2bca2d2a94f38bc25fb2d305a1817b30"
+      "sha256": "55e6f6b7ed852f9d330753b3fc422ea6c610bd66b3ef3f3f77f51472007a10ac"
     }
   ],
   "remote_events": [
     "ReplicatedStorage/NumberRushRemotes/SpinRequest",
     "ReplicatedStorage/NumberRushRemotes/SpinResult",
     "ReplicatedStorage/NumberRushRemotes/SlotRequest",
-    "ReplicatedStorage/NumberRushRemotes/SlotResult"
+    "ReplicatedStorage/NumberRushRemotes/SlotResult",
+    "ReplicatedStorage/NumberRushRemotes/ProgressRequest",
+    "ReplicatedStorage/NumberRushRemotes/ProgressResult"
   ],
   "excluded_disabled_scripts": [
     "DataStoreCheck",

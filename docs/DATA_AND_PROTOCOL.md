@@ -1,4 +1,32 @@
+## Шаг 38 — пакетная выдача
+
+SpinRequest(operatorId, regionId, sequence, batchCount?), по умолчанию 1, сервер допускает 1..3 и проверяет Batch. Data.Upgrades.Batch=0..2, репликация UpgradeBatch. UpgradeTreeVersion=2 и SchemaVersion прежние.
+
+Для пакета PendingSpin дополнен BatchCount, BatchIndex, BatchDrafts, BatchItems, UnitPrice, BatchRoot. Price — стоимость ещё не выданных SIM. Все черновики и полная оплата сохраняются до Reserve. После каждого Confirm сохраняются предмет и переход к следующему кандидату; следующий OperationId = BatchRoot:индекс. Неизвестный результат записи требует восстановления, не новой оплаты. Старый одиночный журнал работает без этих полей.
+
+Success сохраняет прежний Item (последний) и новый Items для пакета. При исчерпании попыток возвращается только оставшаяся Price; уже выданные SIM остаются, квитанция Success/Items/Refunded/Reason. Если не выдано ничего — Cancelled. Повтор sequence возвращает LastSpin без выдачи/списания. Детали и границы проверок OFFICE_BATCH_V1.md.
+
 # Сохранения и сетевой протокол
+
+Шаг 36: UpgradeTreeVersion=2, IncomeFormulaVersion=2; схема DataStore прежняя. Перенос эффектов старых уровней и пересчёт дохода коллекции сохраняются перед DataReady. ProgressRequest/SpinRequest не изменены; новая ошибка UpgradeLocked. См. REFINEMENT_V2.md.
+
+## Шаг 35 — прокачка и продажа
+
+Добавлены ProgressRequest (клиент → сервер: action Buy/Sell, branch/issuanceId, expectedLevel для Buy) и ProgressResult (Status, ErrorCode?/Message?, Action?, Levels?/Branch?/Paid? либо IssuanceId/Amount). Цена, владение и уровни серверные. Повтор Buy с прежним уровнем не покупает следующий.
+
+Data.Upgrades = {Storage, Slots, Luck, Speed, Auto}, целые последовательные уровни. Старый профиль без поля получает уровни Storage/Slots по существующим лимитам, остальные нули, без сброса. Некорректные/несогласованные поля отклоняются. Репликация: UpgradeStorage/Slots/Luck/Speed/Auto и прежние лимиты. SpinService применяет личные веса/время.
+
+Data.PendingSale = {IssuanceId, FullNumber, Generation, Amount} — уже сохранённые начисление и удаление, ожидающее завершения освобождение реестра. LastSale — квитанция без повторной выплаты. ReleaseOwned освобождает только совпадающий Owned-выпуск/владельца/поколение; повтор Free того же выпуска успешен. Большее поколение доказывает уже завершённое освобождение старого выпуска; новый владелец не меняется. Неизвестный исход не откатываем. Recover после PendingSpin и до DataReady. См. CORE_RELEASE.md.
+
+ProgressBusy — только сессионный флаг. DataStore имена/ключи/SchemaVersion прежние. Старые утверждения об отсутствии продажи Owned ниже исторические.
+
+## Дополнение шага 34 — выдача по региону
+
+SpinRequest = operatorId:string, regionId:string, sequence:integer. Старый пакет code/sequence отклоняется без оплаты. Started содержит OperatorId/RegionId/Duration; код определяется только сервером. Предмет v3 хранит EconomyVersion=3, RegionId и OfferPrice; для оценки применяется Regional с престижем 1. Цена и регион фиксируются в PendingSpin. Повтор кандидата использует сохранённый контекст, возврат — PendingSpin.Price. Legacy PendingSpin без EconomyVersion продолжает восстанавливаться через прежний CodeOffers; старые предметы не переписываются. SchemaVersion и имена/ключи DataStore прежние. Ниже старые описания выбора кода относятся к исторической версии.
+
+## Дополнение шага 33 — свободная замена и EquipBest
+
+SlotRequest допускает действие EquipBest: клиент отправляет action, nil, nil, expectedRevision. Сервер сам выбирает предметы по IncomePerHour, SalePrice и стабильному IssuanceId; клиент не передаёт лучший набор. В одном снимке сохраняются все назначения, ревизия, баланс и остаток дохода. Повтор оптимального набора возвращает Unchanged. Неизвестный результат записи переводит сессию в NeedsRecovery без слепого отката. ChangedAt остаётся исторической меткой для совместимости; NextChangeAt и CooldownRemaining всегда нули. Формат/имена DataStore и SchemaVersion не менялись. Старые описания часового ограничения ниже отменены.
 
 ## Окружения
 
@@ -21,6 +49,9 @@
 - NextSpinSequence: появляется при инициализации сервера, начинается с 1.
 - PendingSpin: журнал одной незавершённой платной выдачи.
 - LastSpin: последняя квитанция Success/Cancelled для повторного ответа без новой оплаты.
+- IncomeRemainder: целый остаток 0..3599999; доля рубля с делителем 3600000. Отсутствующее поле старого профиля инициализируется нулём без сброса других данных. Повреждённое поле отклоняется.
+
+Онлайн-доход: сессионные IncomeClock/IncomeRate/IncomeStoppedAt и функции BeforeSave/UpdateIncomeRate не сохраняются. Время берётся из os.clock в миллисекундах; на новом сервере начинается заново, офлайн не оплачивается. Сохраняются одновременно Balance и IncomeRemainder. BeforeSave начисляет до снимка, UpdateIncomeRate рассчитывает старый период по старой ставке перед фиксацией новой. При выходе IncomeStoppedAt фиксирует конец оплачиваемого времени. Автоматические тики пропускают занятые операции и затем учитывают прошедшее время; NeedsRecovery и истекающая аренда блокируют выплаты. Авария может потерять доход после последнего успешного снимка; абсолютная сохранность не обещается.
 
 Session.Token/LeaseUntil/Busy/Closing/SpinBusy/RequestBusy/NeedsRecovery/BalanceValue — поля серверной сессии в памяти, не часть Data. Аренда 120 секунд, автосохранение раз в 30 секунд, контроль срока каждые 5 секунд. Ошибка чтения не создаёт новый профиль поверх существующего.
 
@@ -56,7 +87,7 @@ Session.Token/LeaseUntil/Busy/Closing/SpinBusy/RequestBusy/NeedsRecovery/Balance
 
 | Событие | Направление | Параметры |
 |---|---|---|
-| SpinRequest | Клиент → сервер | code: string, sequence: integer |
+| SpinRequest | Клиент → сервер | operatorId: string, regionId: string, sequence: integer |
 | SpinResult Started | Сервер → клиент | Status, Sequence, Code, Duration |
 | SpinResult Success | Сервер → клиент | Status, Sequence, Balance, Item, NextSequence, InventoryCount |
 | SpinResult Cancelled | Сервер → клиент | Status, Sequence, Balance, Reason, NextSequence, InventoryCount |

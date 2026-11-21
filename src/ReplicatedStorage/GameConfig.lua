@@ -75,4 +75,42 @@ for _, operator in Config.Operators do
 	end
 end
 
+-- Legacy profiles/offers above are retained only for existing items and PendingSpin recovery.
+Config.EconomyVersion = 3
+Config.Profiles.Regional = {Name = "Региональная выдача", Price = 5000, Prestige = 1.00,
+	Weights = {6000000, 3000000, 880000, 110000, 9900, 100}}
+Config.Operators = {
+	{Id = "beelink", Name = "БиЛайнк", ThemeColor = Color3.fromRGB(245, 193, 34), TextColor = Color3.fromRGB(33, 32, 27)},
+	{Id = "mobitel", Name = "Мобител", ThemeColor = Color3.fromRGB(213, 45, 61), TextColor = Color3.new(1, 1, 1)},
+	{Id = "megalink", Name = "МегаЛинк", ThemeColor = Color3.fromRGB(22, 144, 98), TextColor = Color3.new(1, 1, 1)},
+	{Id = "telenova", Name = "ТелеНова", ThemeColor = Color3.fromRGB(35, 40, 52), TextColor = Color3.new(1, 1, 1)},
+}
+Config.OperatorById, Config.RegionsById = {}, {}
+for _, operator in ipairs(Config.Operators) do Config.OperatorById[operator.Id] = operator end
+local Catalog = require(script.Parent:WaitForChild("RegionCatalog"))
+Config.CatalogDate = Catalog.SnapshotDate
+for _, region in ipairs(Catalog.Regions) do Config.RegionsById[region.Id] = region end
+
+function Config.ResolveRegion(operatorId, regionId)
+	local operator, region = Config.OperatorById[operatorId], Config.RegionsById[regionId]
+	if not operator or not region or not region.Codes[operatorId] or #region.Codes[operatorId] == 0 then return nil end
+	return {Id = region.Id, Region = region.Name, Name = region.Name, Price = region.Price,
+		Kind = region.Kind, Codes = region.Codes[operatorId], OperatorId = operatorId, OperatorName = operator.Name, ProfileId = "Regional"}
+end
+
+function Config.GetRegionOffers(operatorId)
+	local result = {}
+	for _, region in ipairs(Catalog.Regions) do
+		local offer = Config.ResolveRegion(operatorId, region.Id)
+		if offer then table.insert(result, offer) end
+	end
+	return result
+end
+
+function Config.GetDefaultOffer(operatorId)
+	local offers = Config.GetRegionOffers(operatorId)
+	for _, offer in ipairs(offers) do if offer.Region == "Московская область" then return offer end end
+	return offers[1]
+end
+
 return Config

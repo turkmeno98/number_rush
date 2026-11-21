@@ -37,7 +37,7 @@ local function fixture()
 	now, writes, mode, persisted = 1700000000, 0, nil, nil
 	local data = {Balance = 85000, Inventory = {}, IncomeSlots = {}, IncomeSlotCount = 3, SlotRevision = 0}
 	for _, id in ipairs({"a","b","c"}) do
-		data.Inventory[id] = {IssuanceId = id, DisplayNumber = id, Location = "Inventory", IncomePerHour = 10000, RarityName = "Обычный"}
+		data.Inventory[id] = {IssuanceId = id, DisplayNumber = id, Location = "Inventory", IncomePerHour = 10000, SalePrice = 1000, RarityName = "Обычный"}
 	end
 	return {UserId = 1, LeaseUntil = now + 100000, Data = data, Closed = false, Busy = false}
 end
@@ -94,12 +94,13 @@ test("item in another activity is unavailable", function()
 	local s=fixture(); s.Data.Inventory.a.Location="Market"
 	errorWithoutMutation(s,"ItemUnavailable",function() return Service.Install(s,1,"a",0) end)
 end)
-test("replacement before 60 minutes rejected", function()
-	local s=fixture(); assert(Service.Install(s,1,"a",0)); now=now+3599
-	errorWithoutMutation(s,"Cooldown",function() return Service.Install(s,1,"b",1) end)
+test("replacement immediately after install is allowed", function()
+	local s=fixture(); assert(Service.Install(s,1,"a",0)); now=now+1
+	assert(Service.Install(s,1,"b",1))
+	assert(s.Data.IncomeSlots["1"].IssuanceId == "b")
 end)
-test("replacement after cooldown releases old item", function()
-	local s=fixture(); assert(Service.Install(s,1,"a",0)); now=now+3600
+test("replacement releases old item without waiting", function()
+	local s=fixture(); assert(Service.Install(s,1,"a",0))
 	assert(Service.Install(s,1,"b",1))
 	assert(s.Data.Inventory.a.Location=="Inventory" and s.Data.Inventory.a.IncomeSlotIndex==nil)
 	assert(s.Data.Inventory.b.Location=="IncomeSlot" and s.Data.IncomeSlots["1"].IssuanceId=="b")
@@ -109,12 +110,12 @@ test("last source cannot be removed", function()
 	local s=fixture(); assert(Service.Install(s,1,"a",0))
 	errorWithoutMutation(s,"LastIncomeSource",function() return Service.Remove(s,1,1) end)
 end)
-test("removal keeps cooldown and prevents empty-slot bypass", function()
+test("removed slot can be filled immediately", function()
 	local s=fixture(); assert(Service.Install(s,1,"a",0)); assert(Service.Install(s,2,"b",1))
 	local changed=s.Data.IncomeSlots["1"].ChangedAt
 	assert(Service.Remove(s,1,2))
 	assert(s.Data.IncomeSlots["1"].ChangedAt==changed and s.Data.Inventory.a.Location=="Inventory")
-	errorWithoutMutation(s,"Cooldown",function() return Service.Install(s,1,"c",3) end)
+	assert(Service.Install(s,1,"c",3))
 end)
 test("removing empty slot is unchanged", function()
 	local s=fixture(); local r=assert(Service.Remove(s,2,0))

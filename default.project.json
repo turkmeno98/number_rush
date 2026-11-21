@@ -24,7 +24,22 @@
         },
         "SlotResult": {
           "$className": "RemoteEvent"
+        },
+        "ProgressRequest": {
+          "$className": "RemoteEvent"
+        },
+        "ProgressResult": {
+          "$className": "RemoteEvent"
         }
+      },
+      "NewsConfig": {
+        "$path": "src/ReplicatedStorage/NewsConfig.lua"
+      },
+      "RegionCatalog": {
+        "$path": "src/ReplicatedStorage/RegionCatalog.lua"
+      },
+      "UpgradeConfig": {
+        "$path": "src/ReplicatedStorage/UpgradeConfig.lua"
       }
     },
     "ServerScriptService": {
@@ -37,6 +52,12 @@
         "$className": "StarterPlayerScripts",
         "CollectionUI": {
           "$path": "src/StarterPlayer/StarterPlayerScripts/CollectionUI.client.lua"
+        },
+        "DesktopUI": {
+          "$path": "src/StarterPlayer/StarterPlayerScripts/DesktopUI.lua"
+        },
+        "IncomeSlotUI": {
+          "$path": "src/StarterPlayer/StarterPlayerScripts/IncomeSlotUI.client.lua"
         },
         "NumberRushUI": {
           "$path": "src/StarterPlayer/StarterPlayerScripts/NumberRushUI.client.lua"

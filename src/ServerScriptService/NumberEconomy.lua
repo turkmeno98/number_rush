@@ -22,10 +22,19 @@ function NumberEconomy.Evaluate(digits, code, profileId)
 		FullNumber = "7" .. code .. digits,
 		DisplayNumber = string.format("+7 (%s) %s-%s-%s", code, digits:sub(1, 3), digits:sub(4, 5), digits:sub(6, 7)),
 		RarityIndex = rarityIndex, RarityName = rarity.Name,
-		BasePrice = rarity.BasePrice, SalePrice = salePrice, IncomePerHour = rarity.IncomePerHour,
+		BasePrice = rarity.BasePrice, SalePrice = salePrice,
+		IncomePerHour = math.floor((rarity.IncomePerHour * digitTotal * prestigePoints * matchPoints + denominator / 2) / denominator),
+		IncomeFormulaVersion = 2,
 		DigitMultiplier = digitTotal / 700, PrestigeMultiplier = prestigePoints / 100,
 		CodeMatchMultiplier = matchPoints / 100, HasCodeMatch = hasCodeMatch,
 	}
 end
 
+function NumberEconomy.RefreshIncome(data)
+	for _, item in pairs(data.Inventory) do
+		local value = NumberEconomy.Evaluate(item.Digits, item.Code, item.ProfileId)
+		item.IncomePerHour = value.IncomePerHour
+		item.IncomeFormulaVersion = 2
+	end
+end
 return NumberEconomy

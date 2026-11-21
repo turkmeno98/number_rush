@@ -71,6 +71,10 @@ function PlayerDataStore.Save(session, release)
 	if session.Closed then return true end
 	if session.Busy then return false, "Сохранение уже выполняется" end
 	if not validData(session.Data) then return false, "Некорректные данные для сохранения" end
+	if session.BeforeSave then
+		local ok, reason = session.BeforeSave()
+		if not ok then return false, reason end
+	end
 	local snapshot = copyTable(session.Data)
 	session.Busy = true
 	local failureReason = "Блокировка профиля потеряна"
