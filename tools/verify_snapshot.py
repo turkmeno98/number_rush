@@ -7,8 +7,8 @@ import re
 import xml.etree.ElementTree as ET
 
 ROOT=Path(__file__).resolve().parents[1]
-manifest=json.loads((ROOT/'snapshot_manifest.json').read_text())
-project=json.loads((ROOT/'default.project.json').read_text())
+manifest=json.loads((ROOT/'snapshot_manifest.json').read_text(encoding='utf-8'))
+project=json.loads((ROOT/'default.project.json').read_text(encoding='utf-8'))
 assert project['tree']['$className']=='DataModel'
 assert manifest['original_rbxl_received'] is False
 tree=ET.parse(ROOT/manifest['generated_place'])
@@ -21,14 +21,25 @@ def walk(parent,prefix=''):
         instances[path]=item
         walk(item,path)
 walk(tree.getroot())
-assert len(manifest['sources'])==21
+assert len(manifest['sources']) == 30
+trading_folder = 'ServerScriptService/NR_TradingFoundation'
+assert instances[trading_folder].get('class') == 'Folder'
+trading_modules = {
+    'MarketConfig', 'InventoryGuard', 'TransactionJournal', 'ReservationService',
+    'TradeEligibilityService', 'ListingDraftService', 'ListingRecordStore',
+    'PersistentListingClaim', 'ListingCoordinator',
+}
+for name in trading_modules:
+    assert instances[f'{trading_folder}/{name}'].get('class') == 'ModuleScript'
+config_path = ROOT / 'src' / trading_folder / 'MarketConfig.lua'
+assert re.search(r'^MarketConfig\.Enabled\s*=\s*false\b', config_path.read_text(encoding='utf-8'), re.M)
 for entry in manifest['sources']:
     file=ROOT/entry['source']
     assert hashlib.sha256(file.read_bytes()).hexdigest()==entry['sha256'],file
     item=instances[entry['studio_path']]
     assert item.get('class')==entry['class'],entry
     source=item.find("Properties/ProtectedString[@name='Source']").text
-    assert source==file.read_text(),entry
+    assert source==file.read_text(encoding='utf-8'),entry
 for path in manifest['remote_events']:
     assert instances[path].get('class')=='RemoteEvent'
 assert len(manifest['remote_events'])==6
@@ -36,7 +47,7 @@ assert 'ReplicatedStorage/NumberRushRemotes/SlotRequest' in instances
 assert 'ReplicatedStorage/NumberRushRemotes/SlotResult' in instances
 for name in manifest['excluded_disabled_scripts']:
     assert f'ServerScriptService/{name}' not in instances
-config=(ROOT/'src/ReplicatedStorage/GameConfig.lua').read_text()
+config=(ROOT/'src/ReplicatedStorage/GameConfig.lua').read_text(encoding='utf-8')
 assert config.rstrip().endswith('return Config')
 codes=re.findall(r'Code = "(\d{3})"',config)
 assert len(codes)==len(set(codes))==12
@@ -45,13 +56,13 @@ assert len(weights)==4
 for row in weights:
     values=list(map(int,re.findall(r'\d+',row)))
     assert len(values)==6 and sum(values)==10000000
-server=(ROOT/'src/ServerScriptService/GameServer.server.lua').read_text()
+server=(ROOT/'src/ServerScriptService/GameServer.server.lua').read_text(encoding='utf-8')
 assert 'ErrorCode = code' in server
 assert 'SpinService.Recover(session)' in server
 assert 'session.BalanceValue = rubles' in server
-bootstrap=(ROOT/'src/StarterPlayer/StarterPlayerScripts/NumberRushUI.client.lua').read_text()
+bootstrap=(ROOT/'src/StarterPlayer/StarterPlayerScripts/NumberRushUI.client.lua').read_text(encoding='utf-8')
 assert 'WaitForChild("DesktopUI")' in bootstrap
-ui=(ROOT/'src/StarterPlayer/StarterPlayerScripts/DesktopUI.lua').read_text()
+ui=(ROOT/'src/StarterPlayer/StarterPlayerScripts/DesktopUI.lua').read_text(encoding='utf-8')
 assert instances['StarterPlayer/StarterPlayerScripts/DesktopUI'].get('class')=='ModuleScript'
 assert 'WaitForChild("leaderstats", 30)' in ui
 assert 'requestRemote:FireServer(operatorId, regionId, sequence, progress.Count)' in ui
@@ -65,7 +76,7 @@ assert 'WindowScale' not in ui
 assert 'SetCoreGuiEnabled' not in ui
 collection_path='StarterPlayer/StarterPlayerScripts/CollectionUI'
 assert instances[collection_path].get('class')=='LocalScript'
-collection=(ROOT/'src/StarterPlayer/StarterPlayerScripts/CollectionUI.client.lua').read_text()
+collection=(ROOT/'src/StarterPlayer/StarterPlayerScripts/CollectionUI.client.lua').read_text(encoding='utf-8')
 assert 'FireServer' not in collection
 assert 'DataStoreService' not in collection
 assert 'NumberInventory' in collection
@@ -76,10 +87,10 @@ assert instances['ServerScriptService/IncomeSlotService'].get('class')=='ModuleS
 assert 'IncomeSlotService.Initialize(session)' in server
 assert 'slotRequest.OnServerEvent:Connect' in server
 assert server.count('session.SlotBusy') >= 3
-slots=(ROOT/'src/ServerScriptService/IncomeSlotService.lua').read_text()
+slots=(ROOT/'src/ServerScriptService/IncomeSlotService.lua').read_text(encoding='utf-8')
 assert 'Balance =' not in slots and 'Balance +=' not in slots
 assert (ROOT/'docs/HANDOFF.md').is_file()
 assert (ROOT/'docs/BALANCE_V02.md').is_file()
 assert (ROOT/'AGENTS.md').is_file()
-print('PASS: 21 source hashes and XML Source roundtrips; office, regional catalog, news and desktop UI included; 6 RemoteEvents; disabled probes excluded; 12 legacy codes; 4 weight totals; checkpoint documents.')
+print('PASS: 30 source hashes and XML Source roundtrips; office, regional catalog, news and desktop UI included; 6 RemoteEvents; disabled probes excluded; 12 legacy codes; 4 weight totals; checkpoint documents.')
 print('Not executed: Luau runtime, Studio import, DataStore operations, multiplayer fault cases.')
